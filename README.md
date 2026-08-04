@@ -103,7 +103,9 @@ module.exports = {
 | Field / Input / Textarea | 완료 |
 | Card (blueprint) | 완료 |
 | Tag | 완료 — `accent`/`accent-2`/`neutral`/`outline`은 Industry 기본, `success`/`warning`/`danger`/`highlight`는 **posselect 자체 추가**(주문/재고 상태 + 혜택 신호용, Industry 원본엔 없음) |
-| Nav | 완료 (`brand`는 ReactNode — 보통 `<Logo />`를 넣음, children으로 링크 구성) |
+| Nav | 완료 (`brand`는 ReactNode — 보통 `<Logo />`를 넣음, children으로 링크 구성). 서브 서비스/관리자용 기본형 — customer.front/home.front/product.front는 아래 Header/Footer를 대신 쓴다 |
+| Header | 완료 — customer.front/home.front/product.front 공통 상단 헤더(유틸리티 바 + 검색/아이콘 메인 바 + 카테고리 바, 반응형). `categories`는 호스트 앱이 서버에서 캐시 fetch해 props로 주입, 로그인/장바구니 상태는 컴포넌트가 마운트 후 `/api/auth/me`·`/api/cart`를 직접 호출해 채운다 — 아래 "Header/Footer 적용" 참고 |
+| Footer | 완료 — customer.front/home.front/product.front 공통 하단 푸터(사업자 정보/고객센터/링크/결제수단/저작권). 완전 정적이라 props 없음 |
 | Logo | 완료 — "PosSelect" 워드마크(코랄 Pos + 블루 Select + ®). **브랜드명을 화면에 노출할 땐 항상 이 컴포넌트를 쓰거나, 텍스트라면 반드시 "PosSelect"로 표기 — "POSSELECT"(전체 대문자) 금지** |
 | Table | 완료 — 얇은 wrapper (`<table class="table">`), thead/tbody/tr/td는 네이티브 그대로 사용 |
 | Dialog | 완료 — backdrop + blueprint 프레임 + 모서리 마크, `actions`로 버튼 슬롯 |
@@ -147,3 +149,27 @@ const nextConfig = {
 4. Tailwind v4는 CSS `@theme`로 토큰을 선언하는 방식이라 `tailwind.config.js`(v3 스타일)는 **참고용일
    뿐 이 앱들에는 직접 적용되지 않음** — 실제로는 `tokens.css`의 CSS 변수 + 컴포넌트 클래스만으로 충분하며
    Tailwind 유틸리티 매핑이 꼭 필요해지면 그때 `@theme` 블록으로 별도 변환할 것
+
+## Header/Footer 적용 (2026-08-04)
+
+customer.front / home.front / product.front 3개는 각자 `app/layout.tsx`(Server Component)에서
+`<Header categories={categories} />{children}<Footer />`로 감싼다.
+
+- **카테고리 데이터**: 각 앱의 `layout.tsx`가 서버에서 직접 fetch한다 — Header 자신은 fetch하지 않는다.
+  ```tsx
+  async function getCategories(): Promise<HeaderCategory[]> {
+    const res = await fetch('https://product.posselect.com/api/categories', {
+      next: { revalidate: 300 }, // 5분 캐시 — 카테고리는 자주 안 바뀌므로 매 요청 DB 조회를 피함
+    });
+    if (!res.ok) return [];
+    const data: { id: number; name: string }[] = await res.json();
+    return data.map((c) => ({ id: c.id, name: c.name, href: `https://product.posselect.com/?category=${c.id}` }));
+  }
+  ```
+  `next.revalidate`로 캐시하기 때문에 카테고리가 바뀌어도 앱을 재배포할 필요 없이 최대 5분 안에
+  전체 프론트에 전파된다. 실패 시 빈 배열로 폴백해 헤더 자체는 항상 렌더링되게 한다(카테고리 API
+  장애가 전체 페이지 장애로 번지지 않도록).
+- **로그인/장바구니 상태(개인화)**: Header 컴포넌트가 마운트 후 자체적으로 `/api/auth/me`,
+  `/api/cart`를 호출해서 채운다 — 앱마다 이 로직을 중복 구현하지 않는다. 이 두 호출은 SSR 셸과
+  분리되어 있어 캐시된 헤더/카테고리 렌더링을 사용자별로 쪼개지 않는다(CDN/Next fetch 캐시 히트율 유지).
+- **admin.front는 대상 아님** — 기존 단순 `Nav`(관리자 전용, 로그인 강제) 그대로 유지.
