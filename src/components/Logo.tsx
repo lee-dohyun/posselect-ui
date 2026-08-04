@@ -11,14 +11,17 @@ interface LogoProps {
  * "POSSELECT") when an image isn't practical.
  */
 export function Logo({ size = 22, className = '' }: LogoProps) {
+  const width = Math.round(size * (560 / 160));
   return (
     <svg
       className={className}
+      width={width}
       height={size}
       viewBox="0 0 560 160"
       xmlns="http://www.w3.org/2000/svg"
       role="img"
       aria-label="PosSelect"
+      style={{ flexShrink: 0, display: 'block' }}
     >
       <text
         x="4"
