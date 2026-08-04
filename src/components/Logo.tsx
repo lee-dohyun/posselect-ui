@@ -10,14 +10,17 @@ interface LogoProps {
  * Always render the brand this way, or as the plain text "PosSelect" (never
  * "POSSELECT") when an image isn't practical.
  */
+// viewBox sized from a measured getBBox() of the text run (652×167 at this
+// font-size/letter-spacing) plus margin — do not shrink this without
+// re-measuring, the glyphs clip silently against the SVG viewport otherwise.
 export function Logo({ size = 22, className = '' }: LogoProps) {
-  const width = Math.round(size * (560 / 160));
+  const width = Math.round(size * (680 / 180));
   return (
     <svg
       className={className}
       width={width}
       height={size}
-      viewBox="0 0 560 160"
+      viewBox="0 0 680 180"
       xmlns="http://www.w3.org/2000/svg"
       role="img"
       aria-label="PosSelect"
@@ -25,7 +28,7 @@ export function Logo({ size = 22, className = '' }: LogoProps) {
     >
       <text
         x="4"
-        y="118"
+        y="135"
         fontFamily="Arial, Helvetica, sans-serif"
         fontWeight={900}
         fontStyle="italic"
@@ -36,8 +39,8 @@ export function Logo({ size = 22, className = '' }: LogoProps) {
         <tspan fill="#234e95">Select</tspan>
       </text>
       <text
-        x="536"
-        y="34"
+        x="650"
+        y="48"
         fontFamily="Arial, Helvetica, sans-serif"
         fontWeight={400}
         fontSize="26"
