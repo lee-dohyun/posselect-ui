@@ -1,31 +1,47 @@
 interface LogoProps {
-  /** px, height of the wordmark text */
+  /** px, rendered height of the wordmark */
   size?: number;
   className?: string;
 }
 
 /**
- * "PosSelect" brand wordmark — "Pos" in highlight coral, "Select" in accent
- * blue, ® mark. Always render the brand this way (or as the plain text
- * "PosSelect", never "POSSELECT") — this replaces any plain-text brand label.
+ * "PosSelect" brand wordmark as a single SVG image (bold italic, "Pos" in
+ * highlight coral, "Select" in accent blue, ® mark) — not styled text spans.
+ * Always render the brand this way, or as the plain text "PosSelect" (never
+ * "POSSELECT") when an image isn't practical.
  */
 export function Logo({ size = 22, className = '' }: LogoProps) {
   return (
-    <span
+    <svg
       className={className}
-      style={{
-        fontFamily: 'var(--font-heading)',
-        fontWeight: 700,
-        fontSize: size,
-        letterSpacing: '-0.5px',
-        display: 'inline-flex',
-        alignItems: 'baseline',
-        lineHeight: 1,
-      }}
+      height={size}
+      viewBox="0 0 560 160"
+      xmlns="http://www.w3.org/2000/svg"
+      role="img"
+      aria-label="PosSelect"
     >
-      <span style={{ color: 'var(--color-highlight-600)' }}>Pos</span>
-      <span style={{ color: 'var(--color-accent)' }}>Select</span>
-      <sup style={{ fontSize: '0.4em', fontWeight: 400, marginLeft: 2 }}>&reg;</sup>
-    </span>
+      <text
+        x="4"
+        y="118"
+        fontFamily="Arial, Helvetica, sans-serif"
+        fontWeight={900}
+        fontStyle="italic"
+        fontSize="120"
+        letterSpacing="-3"
+      >
+        <tspan fill="#d1553c">Pos</tspan>
+        <tspan fill="#234e95">Select</tspan>
+      </text>
+      <text
+        x="536"
+        y="34"
+        fontFamily="Arial, Helvetica, sans-serif"
+        fontWeight={400}
+        fontSize="26"
+        fill="#234e95"
+      >
+        &#174;
+      </text>
+    </svg>
   );
 }
