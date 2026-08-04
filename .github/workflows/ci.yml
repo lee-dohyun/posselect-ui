@@ -1,0 +1,20 @@
+name: CI
+
+# 참조용 워크플로 — posselect-ui는 배포되는 서비스가 아니라 다른 프론트가 참조하는
+# 라이브러리라서 Docker Hub push는 없음. 타입체크만 확인.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm install --no-save typescript@^5 @types/react@^18 react@^18
+      - run: npx tsc --noEmit
