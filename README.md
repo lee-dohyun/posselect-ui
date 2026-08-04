@@ -116,9 +116,30 @@ claude.ai/design "Posselect design system mockups" 프로젝트(`assets/posselec
 
 태그라인: "Positively Selected for You" / 한글판 "당신을 위한 좋은 선택".
 
-## 각 프론트엔드 적용 방법
+## 각 프론트엔드 적용 방법 (Next.js 15 + Tailwind v4 기준, 2026-08-04 확정)
 
-1. `npm install` (또는 pnpm workspace로 편입 — 저장소 분리돼 있으므로 우선 npm registry 배포 또는
-   git submodule 방식 중 선택 필요)
-2. 루트 레이아웃에서 `import '@posselect/ui/src/styles/tokens.css'` 한 번
-3. 기존 자체 구현 버튼/카드/태그를 이 패키지의 컴포넌트로 점진적 교체
+npm 레지스트리에 올리지 않고 **git 의존성**으로 바로 설치한다:
+
+```bash
+npm install github:lee-dohyun/posselect-ui
+```
+
+`package.json`에 `"@posselect/ui": "github:lee-dohyun/posselect-ui"`로 들어간다. 소스가 `.ts`/`.tsx`
+그대로라 Next.js가 기본적으로는 `node_modules`를 트랜스파일하지 않으므로 `next.config.ts`에 반드시 추가:
+
+```ts
+const nextConfig = {
+  transpilePackages: ['@posselect/ui'],
+};
+```
+
+그 다음:
+1. 루트 레이아웃(`app/layout.tsx` 또는 `app/globals.css`)에서 `import '@posselect/ui/tokens.css'` 한 번
+   — Barlow/Barlow Condensed 폰트도 이 CSS의 `@import`로 자동 로드되므로 `next/font`로 별도 로드할
+   필요 없음 (기존 Geist 폰트 로딩 코드는 제거)
+2. Next.js 기본 스캐폴드의 다크모드 블록(`prefers-color-scheme: dark`)과 `--background`/`--foreground`
+   변수는 제거 — Industry 디자인 시스템은 라이트 전용
+3. 기존 자체 구현 버튼/카드/태그/입력을 이 패키지의 컴포넌트 또는 CSS 클래스(`.btn`, `.card`, `.tag`, `.input`)로 교체
+4. Tailwind v4는 CSS `@theme`로 토큰을 선언하는 방식이라 `tailwind.config.js`(v3 스타일)는 **참고용일
+   뿐 이 앱들에는 직접 적용되지 않음** — 실제로는 `tokens.css`의 CSS 변수 + 컴포넌트 클래스만으로 충분하며
+   Tailwind 유틸리티 매핑이 꼭 필요해지면 그때 `@theme` 블록으로 별도 변환할 것
