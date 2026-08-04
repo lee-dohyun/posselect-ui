@@ -1,4 +1,5 @@
 import { ReactNode } from 'react';
+import { BlueprintCorners } from './Blueprint';
 
 interface CardProps {
   kicker?: string;
@@ -11,15 +12,12 @@ interface CardProps {
 
 /**
  * Blueprint-style card — hairline border + corner registration marks,
- * matching the "Industry" design system's wireframe aesthetic.
+ * matching Industry's components/cards.html.
  */
 export function Card({ kicker, title, children, meta, elevation = 'sm', className = '' }: CardProps) {
   return (
     <div className={`card blueprint elev-${elevation} ${className}`}>
-      <i className="corner tl" />
-      <i className="corner tr" />
-      <i className="corner bl" />
-      <i className="corner br" />
+      <BlueprintCorners />
       {kicker && <div className="card-kicker">{kicker}</div>}
       <div className="card-title">{title}</div>
       {children && <p className="card-body">{children}</p>}
