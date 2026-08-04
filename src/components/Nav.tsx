@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
 
 interface NavProps {
-  brand: string;
+  brand: ReactNode;
   children: ReactNode;
   className?: string;
 }

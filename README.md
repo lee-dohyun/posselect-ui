@@ -20,9 +20,12 @@ posselect 쇼핑몰 공통 디자인 시스템. `customer.front` / `product.fron
 - **타이포**: 헤딩 Barlow Condensed 600 / 본문 Barlow 400. Barlow 계열은 한글 글리프가 없어
   `tokens.css`/`tailwind.config.js` 모두 Pretendard → Malgun Gothic → system-ui 순으로 fallback을
   추가해뒀다 — 한글은 자동으로 Pretendard로 렌더링되고 영문/숫자만 Barlow로 보인다
-- **블루프린트 스타일**: 라운드 0(각짐), 카드/버튼(primary·secondary)/다이얼로그/이미지 모서리에
-  등록마크(`.blueprint` + `<i class="corner tl/tr/bl/br">`) 장식, 채움 없는 투명 배경 + 헤어라인 테두리.
-  ghost 버튼만 예외로 프레임 없음. **모서리 마크를 빼먹지 말 것** — Industry readme.md의 명시적 규칙
+- **블루프린트 스타일**: 라운드 0(각짐), 카드/버튼(primary·secondary)/다이얼로그/이미지에 헤어라인
+  테두리 + 투명 배경. ghost 버튼만 예외로 프레임 없음. **모서리 등록마크("+" 크로스헤어)는 posselect에서
+  껐음(2026-08-04)** — Industry 원본 규칙이지만 실제 화면(상품 그리드 등 밀집 레이아웃)에서 시각적
+  노이즈로 확인되어 제거. `BlueprintCorners`/`<i class="corner ...">` 마크업은 컴포넌트에 여전히
+  남아있지만 `tokens.css`의 `.blueprint > .corner { display: none; }`로 렌더링만 억제됨 — 새 컴포넌트를
+  만들 때 마크업은 넣어도 되고 안 넣어도 무방(어차피 안 보임)
 - spacing은 촘촘한 스케일(`--space-1` 3.4px ~ `--space-8` 27.2px)
 - **아이콘**: Lucide(lucide.dev), stroke-width 1.5, inline SVG + `currentColor` — 굵은 스트로크 아이콘 세트는 쓰지 않는다
 - **이미지**: 콘텐츠 사진은 항상 `.duotone` 래퍼(accent 색으로 washed) + blueprint 프레임을 거친다. 가공 없는 원본 이미지를 그대로 배치하지 않는다
@@ -100,7 +103,8 @@ module.exports = {
 | Field / Input / Textarea | 완료 |
 | Card (blueprint) | 완료 |
 | Tag | 완료 — `accent`/`accent-2`/`neutral`/`outline`은 Industry 기본, `success`/`warning`/`danger`/`highlight`는 **posselect 자체 추가**(주문/재고 상태 + 혜택 신호용, Industry 원본엔 없음) |
-| Nav | 완료 (최소 wrapper, children으로 링크 구성) |
+| Nav | 완료 (`brand`는 ReactNode — 보통 `<Logo />`를 넣음, children으로 링크 구성) |
+| Logo | 완료 — "PosSelect" 워드마크(코랄 Pos + 블루 Select + ®). **브랜드명을 화면에 노출할 땐 항상 이 컴포넌트를 쓰거나, 텍스트라면 반드시 "PosSelect"로 표기 — "POSSELECT"(전체 대문자) 금지** |
 | Table | 완료 — 얇은 wrapper (`<table class="table">`), thead/tbody/tr/td는 네이티브 그대로 사용 |
 | Dialog | 완료 — backdrop + blueprint 프레임 + 모서리 마크, `actions`로 버튼 슬롯 |
 | Figure | 완료 — `.duotone` + blueprint 프레임을 씌운 이미지 래퍼, `caption` prop |

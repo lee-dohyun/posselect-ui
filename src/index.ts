@@ -3,6 +3,7 @@ export { Field, Input, Textarea } from './components/Field';
 export { Card } from './components/Card';
 export { Tag } from './components/Tag';
 export { Nav } from './components/Nav';
+export { Logo } from './components/Logo';
 export { Dialog } from './components/Dialog';
 export { Table } from './components/Table';
 export { Figure } from './components/Figure';
