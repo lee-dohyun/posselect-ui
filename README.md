@@ -9,7 +9,9 @@ posselect 쇼핑몰 공통 디자인 시스템. `customer.front` / `product.fron
 
 ## 디자인 방향
 
-- **단일 accent (steel blue `#5980a6`) 기반 모노톤 팔레트** — neutral/accent 각 9단계 ramp
+- **단일 accent 기반 모노톤 팔레트** — neutral/accent 각 9단계 ramp. 원래 Industry의 steel blue(`#5980a6`)에서
+  2026-08-04 기준 **더 채도 높은 블루 `#234e95`로 액션 컬러가 확정 변경**됨(버튼/링크/active 상태),
+  램프도 그에 맞춰 재생성됨 — mockup 프로젝트의 `github.md` 동기화 메모 기준
 - **시맨틱 컬러**(success/warning/danger)는 이커머스 상태 표시 전용(배송완료, 재고부족, 품절 등)
 - **Highlight 컬러**(코랄/버밀리언 `#d1553c`, 100~900 램프)는 **할인가·쿠폰 등 실제 혜택 신호 전용**.
   로고 파비콘의 코랄 "P"에도 같은 색을 쓴다. **버튼이나 상시 내비게이션/UI 크롬에는 절대 쓰지 않는다** —
