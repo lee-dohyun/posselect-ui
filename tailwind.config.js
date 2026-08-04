@@ -51,6 +51,19 @@ module.exports = {
         success: { DEFAULT: '#6f9b7e', bg: '#e9f1ec' },
         warning: { DEFAULT: '#c9a35f', bg: '#f6efe0' },
         danger: { DEFAULT: '#b06a63', bg: '#f5e8e6' },
+        // posselect-only — discount/coupon badges & logo accent, never buttons/nav.
+        highlight: {
+          DEFAULT: '#d1553c',
+          100: '#faedea',
+          200: '#f3d4cd',
+          300: '#eab0a4',
+          400: '#dd816f',
+          500: '#d46149',
+          600: '#d1553c',
+          700: '#993824',
+          800: '#6f291a',
+          900: '#4a1b12',
+        },
       },
       fontFamily: {
         heading: ['"Barlow Condensed"', '"Pretendard"', '-apple-system', '"Malgun Gothic"', 'system-ui', 'sans-serif'],

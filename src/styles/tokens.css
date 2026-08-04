@@ -56,6 +56,21 @@
   --color-danger: #b06a63;
   --color-danger-bg: #f5e8e6;
 
+  /* Highlight (coral/vermilion) — posselect-only extension, not in Industry base.
+     Reserved for real benefit signals (discount price, coupon amount) and the
+     logo's accent (favicon "P"). Never use on buttons or persistent nav/chrome —
+     that would blur it with the steel accent's role. */
+  --color-highlight: #d1553c;
+  --color-highlight-100: #faedea;
+  --color-highlight-200: #f3d4cd;
+  --color-highlight-300: #eab0a4;
+  --color-highlight-400: #dd816f;
+  --color-highlight-500: #d46149;
+  --color-highlight-600: #d1553c;
+  --color-highlight-700: #993824;
+  --color-highlight-800: #6f291a;
+  --color-highlight-900: #4a1b12;
+
   --font-heading: "Barlow Condensed", "Pretendard", -apple-system, "Malgun Gothic", system-ui, sans-serif;
   --font-heading-weight: 600;
   --font-body: "Barlow", "Pretendard", -apple-system, "Malgun Gothic", system-ui, sans-serif;
@@ -230,6 +245,7 @@ textarea.input { min-height: 90px; resize: vertical; }
 .tag-success { background: var(--color-success-bg); color: var(--color-success); }
 .tag-warning { background: var(--color-warning-bg); color: var(--color-warning); }
 .tag-danger { background: var(--color-danger-bg); color: var(--color-danger); }
+.tag-highlight { background: var(--color-highlight-100); color: var(--color-highlight-700); }
 
 .nav {
   display: flex; align-items: center; gap: var(--space-4);

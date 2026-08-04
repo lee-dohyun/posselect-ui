@@ -11,6 +11,10 @@ posselect 쇼핑몰 공통 디자인 시스템. `customer.front` / `product.fron
 
 - **단일 accent (steel blue `#5980a6`) 기반 모노톤 팔레트** — neutral/accent 각 9단계 ramp
 - **시맨틱 컬러**(success/warning/danger)는 이커머스 상태 표시 전용(배송완료, 재고부족, 품절 등)
+- **Highlight 컬러**(코랄/버밀리언 `#d1553c`, 100~900 램프)는 **할인가·쿠폰 등 실제 혜택 신호 전용**.
+  로고 파비콘의 코랄 "P"에도 같은 색을 쓴다. **버튼이나 상시 내비게이션/UI 크롬에는 절대 쓰지 않는다** —
+  steel accent(주요 액션)와 역할이 섞이면 안 됨. success/warning/danger와 마찬가지로 Industry 원본에는
+  없는 posselect 자체 확장 토큰
 - **타이포**: 헤딩 Barlow Condensed 600 / 본문 Barlow 400. Barlow 계열은 한글 글리프가 없어
   `tokens.css`/`tailwind.config.js` 모두 Pretendard → Malgun Gothic → system-ui 순으로 fallback을
   추가해뒀다 — 한글은 자동으로 Pretendard로 렌더링되고 영문/숫자만 Barlow로 보인다
@@ -93,13 +97,22 @@ module.exports = {
 | Button | 완료 (primary/secondary/ghost + icon/block 모디파이어, primary·secondary는 자동으로 blueprint 프레임) |
 | Field / Input / Textarea | 완료 |
 | Card (blueprint) | 완료 |
-| Tag | 완료 — `accent`/`accent-2`/`neutral`/`outline`은 Industry 기본, `success`/`warning`/`danger`는 **posselect 자체 추가**(주문/재고 상태 표시용, Industry 원본엔 없음) |
+| Tag | 완료 — `accent`/`accent-2`/`neutral`/`outline`은 Industry 기본, `success`/`warning`/`danger`/`highlight`는 **posselect 자체 추가**(주문/재고 상태 + 혜택 신호용, Industry 원본엔 없음) |
 | Nav | 완료 (최소 wrapper, children으로 링크 구성) |
 | Table | 완료 — 얇은 wrapper (`<table class="table">`), thead/tbody/tr/td는 네이티브 그대로 사용 |
 | Dialog | 완료 — backdrop + blueprint 프레임 + 모서리 마크, `actions`로 버튼 슬롯 |
 | Figure | 완료 — `.duotone` + blueprint 프레임을 씌운 이미지 래퍼, `caption` prop |
 | Toast | 미구현 — Industry에 별도 컴포넌트 페이지 없음(장바구니 mockup에서만 인라인으로 등장), 필요해지면 Dialog와 같은 패턴으로 추가 |
 | Icon | 컴포넌트 없음 — Lucide SVG를 그대로 children으로 사용하는 방식 권장(위 사용 예시 참고), 래퍼가 필요할 정도로 반복이 늘면 추가 고려 |
+
+## 브랜드 에셋 (로고)
+
+로고 원본(모노/다크배경용/스택형/태그라인 포함/정방형/파비콘 등)은 코드로 재생성하지 않고
+claude.ai/design "Posselect design system mockups" 프로젝트(`assets/posselect-logo-*.png`)를
+그대로 소스로 참조한다 — 이 저장소에는 바이너리를 중복 보관하지 않음. 실제 프론트에 적용할 때
+해당 프로젝트에서 필요한 변형을 받아 각 앱의 `public/`에 넣을 것.
+
+태그라인: "Positively Selected for You" / 한글판 "당신을 위한 좋은 선택".
 
 ## 각 프론트엔드 적용 방법
 
