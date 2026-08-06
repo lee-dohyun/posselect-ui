@@ -73,3 +73,26 @@ claude.ai 디자인 프로젝트("Posselect design system mockups")에서 "Expor
 2. 실제로 서비스에서 쓸 게 확정되면 같은 키로 `cdn` 버킷에 복사(프로모션).
 3. `design-assets`의 파일이 나중에 바뀌어도 `cdn`은 자동으로 따라 바뀌지 않는다 — 필요하면 다시
    명시적으로 복사해야 한다(의도된 동작 — 검토 없이 스테이징 변경이 바로 서비스에 반영되는 걸 막기 위함).
+4. `cdn` 버킷에 파일을 추가/삭제했으면 `~/msa/imgproxy/cdn-alias/generate-cdn-alias-conf.sh`를
+   재실행해서 아래 "짧은 경로" 매핑도 갱신할 것.
+
+## 짧은 경로: `image.posselect.com/cdn/<key>` (2026-08-06 추가)
+
+`cdn` 버킷 자산의 서명 URL(`/<서명>/rs:fit:0:0/plain/s3://cdn/<key>`)이 문서/코드에 참조하기엔
+너무 길고 복잡하다는 이유로, `image.posselect.com/cdn/<key>` 형태의 짧은 별칭 경로를 추가했다.
+브라우저에서 열면 실제 서명 URL로 302 리다이렉트된다.
+
+**서명을 생략해도 안전한 이유**: imgproxy 서명은 보통 클라이언트가 리사이즈 파라미터(폭/높이/크롭 등)를
+자유롭게 바꿀 수 있을 때, 반복 요청으로 서버 리소스를 소모시키는 남용을 막기 위한 것이다. `cdn` 버킷은
+처리 옵션이 `rs:fit:0:0`(원본 그대로) 고정이라 이 위협이 해당 없고, 애초에 공개해도 되는 브랜드 자산이라
+— 실제 대규모 이커머스(Shopify 등)도 공개 상품/브랜드 이미지는 정해진 프리셋 URL로 서명 없이 서빙하는
+것과 같은 패턴이다.
+
+**구현**: `minio` 네임스페이스의 `cdn-alias` Deployment(퍼블릭 `nginx:alpine` 이미지, 별도 빌드/푸시
+불필요) + Service. `cdn` 버킷의 모든 키를 실제 서명 URL로 302 리다이렉트하는 정적 nginx conf를
+ConfigMap으로 관리(`~/msa/imgproxy/cdn-alias/generate-cdn-alias-conf.sh`가 생성/재적용). gateway
+(`application.yml`)의 `cdn-alias` 라우트(`Host=image.posselect.com` + `Path=/cdn/**`)가 기존
+catch-all `shop-image-proxy` 라우트보다 먼저 매칭되도록 배치되어 있다.
+
+**주의**: 이 매핑은 `cdn` 버킷 상태의 스냅샷이라, 버킷에 파일을 추가/삭제/이름변경하면 위 스크립트를
+반드시 재실행해야 한다 — 자동 동기화되지 않는다.
