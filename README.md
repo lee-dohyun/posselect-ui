@@ -168,10 +168,12 @@ module.exports = {
 
 ## 브랜드 에셋 (로고)
 
-로고 원본(모노/다크배경용/스택형/태그라인 포함/정방형/파비콘 등)은 코드로 재생성하지 않고
-claude.ai/design "Posselect design system mockups" 프로젝트(`assets/posselect-logo-*.png`)를
-그대로 소스로 참조한다 — 이 저장소에는 바이너리를 중복 보관하지 않음. 실제 프론트에 적용할 때
-해당 프로젝트에서 필요한 변형을 받아 각 앱의 `public/`에 넣을 것.
+로고 원본(모노/다크배경용/스택형/태그라인 포함/정방형/파비콘 등)은 claude.ai/design "Posselect design
+system mockups" 프로젝트가 소스 오브 트루스이지만, **이 저장소가 만들어내는 화면(`ui.posselect.com`
+등)에서 실제로 노출할 때는 디자인 프로젝트를 직접 참조하지 않고 MinIO CDN(`image.posselect.com`)을
+통해 서빙**한다 — 자세한 버킷 구조·재수출 절차는 [`docs/image-cdn-policy.md`](docs/image-cdn-policy.md)
+참고. 이 저장소에는 바이너리를 중복 보관하지 않음. 다른 프론트(customer.front 등)에서 로고가 필요하면
+디자인 프로젝트가 아니라 MinIO `cdn` 버킷을 참조할 것.
 
 태그라인: "Positively Selected for You" / 한글판 "당신을 위한 좋은 선택".
 
