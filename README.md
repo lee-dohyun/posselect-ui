@@ -7,6 +7,11 @@ posselect 쇼핑몰 공통 디자인 시스템. `customer.front` / `product.fron
 색상/타이포/spacing 등 토큰을 바꿀 때는 거기서 먼저 확정한 뒤 `src/styles/tokens.css`와
 `tailwind.config.js`에 동일하게 반영한다 — 두 소스가 어긋나지 않도록 유지할 것.
 
+Toast/Pagination/Timeline/Gallery/EmptyState/Skeleton/QuickMenu/WingBanner는 Industry 원본에는
+없는 posselect 전용 확장이라, 소스는 Industry가 아니라 **claude.ai/design "Posselect design system
+mockups" 프로젝트**(id `2e00953e-5a16-41a1-be83-8a5cb3910c01`, 파일 `Posselect Design System.dc.html`)다
+(2026-08-06 해당 문서 기준 구현). 이 8개를 다시 손볼 땐 Industry가 아니라 이 mockup 문서를 먼저 확인할 것.
+
 ## 디자인 방향
 
 - **단일 accent 기반 모노톤 팔레트** — neutral/accent 각 9단계 ramp. 원래 Industry의 steel blue(`#5980a6`)에서
@@ -70,6 +75,50 @@ import { Button, Card, Tag, Field, Input, Table, Dialog, Figure } from '@possele
 </Dialog>
 
 <Figure src="/products/earphone.jpg" alt="무선 이어폰 Pro" caption="정품 인증 상품컷" />
+
+<Pagination page={page} totalPages={12} onPageChange={setPage} />
+
+<Timeline steps={[
+  { label: '주문 완료', time: '8/5 14:20', status: 'done' },
+  { label: '배송 준비중', time: '8/5 16:40', status: 'active' },
+  { label: '배송중', status: 'pending' },
+  { label: '배송 완료', status: 'pending' },
+]} />
+
+<Gallery images={[
+  { src: '/products/earphone-1.jpg', alt: '무선 이어폰 Pro 정면' },
+  { src: '/products/earphone-2.jpg', alt: '무선 이어폰 Pro 측면' },
+]} />
+
+<EmptyState
+  icon={<CartIcon width={40} height={40} strokeWidth={1.5} />}
+  title="장바구니가 비어 있습니다"
+  description="마음에 드는 상품을 담아보세요."
+  action={<Button variant="primary">쇼핑 계속하기</Button>}
+/>
+
+{loading ? <SkeletonCard /> : <Card kicker="신상품" title="무선 이어폰 Pro" meta="₩189,000">노이즈 캔슬링 · 30시간 재생</Card>}
+
+{toastVisible && <Toast>주문이 완료되었습니다</Toast>}
+
+<QuickMenu
+  items={[
+    { icon: <HistoryIcon width={21} height={21} strokeWidth={1.5} />, label: '최근 본', onClick: goToHistory },
+    { icon: <CartIcon width={21} height={21} strokeWidth={1.5} />, label: '장바구니', onClick: goToCart, badge: cartCount },
+    { icon: <HeadsetIcon width={21} height={21} strokeWidth={1.5} />, label: '고객센터', onClick: goToSupport },
+  ]}
+  onScrollTop={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+/>
+
+{bannerOpen && (
+  <WingBanner
+    title="이번주 특가"
+    discount="최대 50% 할인"
+    deadline="8/10까지"
+    image={{ src: '/promo/weekly.jpg', alt: '이번주 특가' }}
+    onClose={() => setBannerOpen(false)}
+  />
+)}
 ```
 
 Button의 `icon` prop은 아이콘 전용 정사각 버튼(`.btn-icon`) 모디파이어다. 아이콘 자체(SVG)는 children으로
@@ -108,7 +157,13 @@ module.exports = {
 | Table | 완료 — 얇은 wrapper (`<table class="table">`), thead/tbody/tr/td는 네이티브 그대로 사용 |
 | Dialog | 완료 — backdrop + blueprint 프레임 + 모서리 마크, `actions`로 버튼 슬롯 |
 | Figure | 완료 — `.duotone` + blueprint 프레임을 씌운 이미지 래퍼, `caption` prop |
-| Toast | 미구현 — Industry에 별도 컴포넌트 페이지 없음(장바구니 mockup에서만 인라인으로 등장), 필요해지면 Dialog와 같은 패턴으로 추가 |
+| Toast | 완료 (2026-08-06) — 고정 위치 알림, `variant`(success/warning/danger), 표시 타이밍은 소비 측 상태로 직접 제어 |
+| Pagination | 완료 (2026-08-06) — `page`/`totalPages`/`onPageChange`, 페이지 목록은 첫/끝/현재±1만 보여주고 나머지는 `…`로 축약 |
+| Timeline | 완료 (2026-08-06) — 배송 타임라인, `steps: {label, time?, status: 'done'\|'active'\|'pending'}[]` |
+| Gallery | 완료 (2026-08-06) — 메인 이미지 + 5단 썸네일, 각각 `.duotone` + blueprint 프레임, 내부 상태로 선택 썸네일 관리 |
+| EmptyState | 완료 (2026-08-06) — blueprint 프레임 안에 아이콘 + 제목 + 설명 + 액션 버튼 1개 |
+| SkeletonBlock / SkeletonCard | 완료 (2026-08-06) — `SkeletonBlock`은 펄스 애니메이션 있는 낱개 블록, `SkeletonCard`는 상품카드 모양(이미지+3줄) 조합 |
+| QuickMenu / WingBanner | 완료 (2026-08-06) — 스크롤을 따라다니는 플로팅 퀵메뉴(우측 고정, 아이콘은 Lucide를 `icon` prop으로 전달 + "맨 위로" 버튼 별도)와 닫기 가능한 프로모션 날개 배너(좌측 고정) |
 | Icon | 컴포넌트 없음 — Lucide SVG를 그대로 children으로 사용하는 방식 권장(위 사용 예시 참고), 래퍼가 필요할 정도로 반복이 늘면 추가 고려 |
 
 ## 브랜드 에셋 (로고)
