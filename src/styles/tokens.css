@@ -82,6 +82,12 @@
   --space-2: 6.8px;
   --space-3: 10.2px;
   --space-4: 13.6px;
+  /* --space-5 was missing until 2026-08-13 while posselect-shell already referenced it in
+     four places (category drawer head/list/children padding). `var()` with no fallback is
+     invalid at computed-value time, so those padding declarations were dropped entirely and
+     the mobile category drawer rendered flush against its edges. Value follows the 3.4px
+     step the rest of the scale uses. */
+  --space-5: 17px;
   --space-6: 20.4px;
   --space-8: 27.2px;
 
@@ -385,3 +391,94 @@ textarea.input { min-height: 90px; resize: vertical; }
 .wing-banner-body { padding: 10px 12px 14px; }
 .wing-banner-discount { font-size: 13px; font-weight: 700; color: var(--color-highlight-600); }
 .wing-banner-deadline { font-size: 11px; color: var(--color-neutral-700); margin-top: 2px; }
+
+/* — layout primitives (2026-08-13) —
+   Page shells were being rebuilt with inline `maxWidth: 1200 / padding: 0 24px` in each
+   front, which can't carry a media query. These two classes are the shared version. */
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin-inline: auto;
+  padding-inline: var(--space-6);
+}
+/* Storefront product grid. Desktop keeps the auto-fill behaviour the fronts already used;
+   the responsive layer below narrows the track so phones get two columns instead of one. */
+.product-grid {
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+}
+/* Scroll container emitted by <Table>. Keeps a wide table's overflow inside the table
+   itself instead of letting it push the whole page into horizontal scroll. */
+.table-wrap { width: 100%; overflow-x: auto; }
+
+/* ───────────────────────────────────────────────────────────────────────────────
+   Responsive layer (2026-08-13, Redmine posselect #128)
+
+   Until now this file had no @media rules at all: every component was authored at
+   desktop width and phones got whatever CSS grid/flex happened to reflow into. The
+   breakpoint is 768px to match posselect-shell (`src/styles.ts`), which already had a
+   `max-width: 768px` block for the header/footer — the two files wrap the same pages, so
+   they must break at the same width. 480px is a second step for phone-only adjustments.
+
+   These can't be CSS custom properties (media queries can't read var()), so the two
+   numbers are duplicated literally here and in posselect-shell. Changing one means
+   changing the other.
+   ─────────────────────────────────────────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  /* Display type is sized for desktop; 42px headings eat a phone viewport. */
+  h1 { font-size: 32px; }
+  h2 { font-size: 26px; }
+  h3 { font-size: 21px; }
+  h4 { font-size: 18px; }
+
+  .container { padding-inline: var(--space-4); }
+
+  /* Two-ish columns on phones rather than one 200px-minimum column. */
+  .product-grid { gap: var(--space-3); grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+
+  .nav { flex-wrap: wrap; gap: var(--space-3); padding: var(--space-3); }
+
+  /* The rail is authored as a desktop side dock (fixed to the right edge, vertically
+     centred). At phone width there is no side gutter to dock into, so it becomes the
+     bottom tab bar that Korean shopping apps use. Only the top border survives. */
+  .quick-menu {
+    top: auto; bottom: 0; left: 0; right: 0;
+    transform: none;
+    display: flex; flex-direction: row;
+    border-left: 0; border-right: 0; border-bottom: 0;
+  }
+  .quick-menu-item { flex: 1; width: auto; height: 56px; }
+  .quick-menu-item + .quick-menu-item { border-top: 0; border-left: 1px solid var(--color-divider); }
+  .quick-menu-top { bottom: calc(56px + var(--space-3)); right: var(--space-3); }
+  /* Keep the bar from covering the end of the page. */
+  body:has(.quick-menu) { padding-bottom: 56px; }
+
+  /* A 132px promo wing docked to the left edge has nowhere to go on a phone, and
+     overlapping the content to show a banner is worse than not showing it. */
+  .wing-banner { display: none; }
+
+  .gallery-main { height: 220px; }
+  /* Fixed 5-up thumbnails shrink to ~55px each on a phone. Scroll them instead. */
+  .gallery-thumbs {
+    display: flex;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .gallery-thumbs::-webkit-scrollbar { display: none; }
+  .gallery-thumb { flex: 0 0 64px; height: 64px; }
+
+  /* Corner-anchored toast is nearly full width at this size anyway — make it deliberate. */
+  .toast { left: var(--space-4); right: var(--space-4); bottom: var(--space-4); }
+  body:has(.quick-menu) .toast { bottom: calc(56px + var(--space-4)); }
+
+  .dialog-backdrop { padding: var(--space-3); }
+  .empty-state { padding: var(--space-8) var(--space-4); }
+}
+
+@media (max-width: 480px) {
+  /* Below ~480px auto-fill drops to a single column; pin it to two so the storefront
+     still reads as a grid. */
+  .product-grid { grid-template-columns: repeat(2, 1fr); }
+}

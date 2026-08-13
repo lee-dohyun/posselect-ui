@@ -75,8 +75,16 @@ module.exports = {
         2: '6.8px',
         3: '10.2px',
         4: '13.6px',
+        5: '17px',
         6: '20.4px',
         8: '27.2px',
+      },
+      // tokens.css 맨 아래 "Responsive layer"와 같은 경계. Tailwind 기본 screens는
+      // min-width(모바일 퍼스트)라 max-width로 쓰인 저쪽 규칙과 경계가 어긋나므로,
+      // 기본값을 덮지 않고 max-* 변형을 따로 추가해 정확히 같은 값을 노출한다.
+      screens: {
+        'max-md': { max: '768px' },
+        'max-sm': { max: '480px' },
       },
       borderRadius: {
         sm: '2px',

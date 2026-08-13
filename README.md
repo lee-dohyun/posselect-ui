@@ -35,6 +35,7 @@ mockups" 프로젝트**(id `2e00953e-5a16-41a1-be83-8a5cb3910c01`, 파일 `Posse
 - **아이콘**: Lucide(lucide.dev), stroke-width 1.5, inline SVG + `currentColor` — 굵은 스트로크 아이콘 세트는 쓰지 않는다
 - **이미지**: 콘텐츠 사진은 항상 `.duotone` 래퍼(accent 색으로 washed) + blueprint 프레임을 거친다. 가공 없는 원본 이미지를 그대로 배치하지 않는다
 - **접근성**: accent 자체는 본문 크기 텍스트에 쓰기엔 대비가 낮음(3:1 수준) — 문단 텍스트에 accent 컬러를 쓸 땐 `--color-accent-700`처럼 진한 ramp 단계를 사용. 키보드 포커스는 항상 `:focus-visible`에 2px accent 링(브라우저 기본 파란 링 금지)
+- **반응형**: 브레이크포인트는 **768px**(태블릿/모바일) + **480px**(폰 전용 보정) 2단계. 768px은 `posselect-shell`(공통 헤더/푸터)이 이미 쓰던 값에 맞춘 것 — 같은 페이지를 위아래로 감싸는 두 저장소가 서로 다른 폭에서 꺾이면 안 되므로 **한쪽을 바꾸면 반드시 다른 쪽도 같이 바꿀 것**. 미디어쿼리는 `var()`를 읽지 못해 CSS 변수로 뺄 수 없고, 두 파일에 리터럴로 중복돼 있다. 상세는 `tokens.css` 맨 아래 "Responsive layer" 섹션
 - **하지 말 것** (Industry readme.md "Don't"): 카드/이미지/버튼을 둥글리지 않기, 카드/이미지에 채움 배경 넣지 않기(줄만 그은 와이어프레임), steel accent 외의 장식용 컬러 추가하지 않기
 
 ## 사용법
@@ -51,6 +52,21 @@ import '@posselect/ui/src/styles/tokens.css';
   <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
   <div class="card-title">무선 이어폰 Pro</div>
 </div>
+```
+
+### 레이아웃 프리미티브 (2026-08-13 추가)
+
+각 프론트가 `maxWidth: 1200 / padding: 0 24px`를 인라인 스타일로 각자 재구현하고 있었는데,
+인라인 스타일에는 미디어쿼리를 붙일 수 없어서 반응형이 원천적으로 불가능했다. 공용 클래스로 사용할 것:
+
+```html
+<!-- 최대 1200px 중앙 정렬 + 브레이크포인트별 좌우 패딩(데스크톱 20.4px / 모바일 13.6px) -->
+<main class="container">
+  <!-- 데스크톱 auto-fill(최소 200px) → 768px 이하 최소 150px → 480px 이하 2열 고정 -->
+  <div class="product-grid">
+    <div class="card blueprint elev-sm">...</div>
+  </div>
+</main>
 ```
 
 ### 2) React 컴포넌트로
@@ -154,7 +170,7 @@ module.exports = {
 | Tag | 완료 — `accent`/`accent-2`/`neutral`/`outline`은 Industry 기본, `success`/`warning`/`danger`/`highlight`는 **posselect 자체 추가**(주문/재고 상태 + 혜택 신호용, Industry 원본엔 없음) |
 | Nav | 완료 (`brand`는 ReactNode — 보통 `<Logo />`를 넣음, children으로 링크 구성) |
 | Logo | 완료 — "PosSelect" 워드마크(코랄 Pos + 블루 Select + ®). **브랜드명을 화면에 노출할 땐 항상 이 컴포넌트를 쓰거나, 텍스트라면 반드시 "PosSelect"로 표기 — "POSSELECT"(전체 대문자) 금지** |
-| Table | 완료 — 얇은 wrapper (`<table class="table">`), thead/tbody/tr/td는 네이티브 그대로 사용 |
+| Table | 완료 — 얇은 wrapper (`<table class="table">`), thead/tbody/tr/td는 네이티브 그대로 사용. 2026-08-13부터 `.table-wrap` 스크롤 컨테이너로 감싸서 넓은 표가 페이지 전체를 가로 스크롤시키지 않게 함 |
 | Dialog | 완료 — backdrop + blueprint 프레임 + 모서리 마크, `actions`로 버튼 슬롯 |
 | Figure | 완료 — `.duotone` + blueprint 프레임을 씌운 이미지 래퍼, `caption` prop |
 | Toast | 완료 (2026-08-06) — 고정 위치 알림, `variant`(success/warning/danger), 표시 타이밍은 소비 측 상태로 직접 제어 |
