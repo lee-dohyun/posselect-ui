@@ -179,7 +179,7 @@ module.exports = {
 | Card (blueprint) | 완료 |
 | Tag | 완료 — `accent`/`accent-2`/`neutral`/`outline`은 Industry 기본, `success`/`warning`/`danger`/`highlight`는 **posselect 자체 추가**(주문/재고 상태 + 혜택 신호용, Industry 원본엔 없음) |
 | Nav | 완료 (`brand`는 ReactNode — 보통 `<Logo />`를 넣음, children으로 링크 구성) |
-| Logo | 완료 — "PosSelect" 워드마크(코랄 Pos + 블루 Select + ®). **브랜드명을 화면에 노출할 땐 항상 이 컴포넌트를 쓰거나, 텍스트라면 반드시 "PosSelect"로 표기 — "POSSELECT"(전체 대문자) 금지** |
+| Logo | 완료 — "PosSelect" 워드마크(코랄 Pos + 블루 Select). 2026-08-14부터 Arial 기반 SVG 텍스트를 직접 그리지 않고 **posselect-shell 헤더와 같은 CDN 자산**을 참조한다(폰트 유무에 따라 기기마다 모양이 달라지던 문제 + 정식 자산엔 없는 ® 마크가 붙던 문제 해결). **브랜드명을 화면에 노출할 땐 항상 이 컴포넌트를 쓰거나, 텍스트라면 반드시 "PosSelect"로 표기 — "POSSELECT"(전체 대문자) 금지** |
 | Table | 완료 — 얇은 wrapper (`<table class="table">`), thead/tbody/tr/td는 네이티브 그대로 사용. 2026-08-13부터 `.table-wrap` 스크롤 컨테이너로 감싸서 넓은 표가 페이지 전체를 가로 스크롤시키지 않게 함 |
 | Dialog | 완료 — backdrop + blueprint 프레임 + 모서리 마크, `actions`로 버튼 슬롯 |
 | Figure | 완료 — `.duotone` + blueprint 프레임을 씌운 이미지 래퍼, `caption` prop |

@@ -36,6 +36,10 @@ export const NavBar: Story = {
 /**
  * 브랜드명을 화면에 노출할 땐 항상 이 컴포넌트를 쓰거나 텍스트 "PosSelect"로 적는다 —
  * "POSSELECT"(전체 대문자)는 금지.
+ *
+ * 워드마크는 저장소에 바이너리로 두지 않고 MinIO CDN(`image.posselect.com`)에서 서빙되는
+ * 정식 자산을 그대로 참조한다. posselect-shell의 공통 헤더도 같은 URL을 쓰므로 로고를 바꿀
+ * 때는 cdn 버킷의 `logos/posselect-logo-hires-no-r.webp` 하나만 교체하면 된다.
  */
 export const BrandLogo: Story = {
   render: () => (
