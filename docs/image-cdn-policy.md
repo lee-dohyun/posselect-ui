@@ -1,12 +1,17 @@
 # 이미지 CDN 정책
 
-`ui.posselect.com`(`site/index.html`)을 비롯해 이 저장소가 만들어내는 화면에 노출되는 브랜드 이미지(로고,
-파비콘 등)는 **파일 자체를 페이지에 내장(base64 임베드)하지 않고, MinIO에 업로드한 이미지를 CDN을 통해
-외부 URL로 참조**하는 것을 원칙으로 한다.
+이 저장소가 만들어내는 화면(`ui.posselect.com`/`storybook.posselect.com`의 Storybook, `/mockup/`에 보존된
+`site/index.html`)에 노출되는 브랜드 이미지(로고, 파비콘 등)는 **파일 자체를 페이지에 내장(base64 임베드)하지
+않고, MinIO에 업로드한 이미지를 CDN을 통해 외부 URL로 참조**하는 것을 원칙으로 한다.
+
+Storybook 쪽에서 이 원칙이 적용되는 곳은 `.storybook/manager.ts`의 `brandImage`다(사이드바 로고). 반대로
+스토리 픽스처의 회색 플레이스홀더(`src/stories/fixtures.tsx`)는 브랜드 자산이 아니라 상품 사진 자리를 채우는
+더미이므로 인라인 SVG 데이터 URI로 만든다 — 스토리북이 CDN 가용성에 의존하지 않는 편이 낫다.
 
 ## 왜
 
-- `site/index.html`은 claude.ai 디자인 툴의 "standalone export" 결과물을 그대로 배포한 것인데, 이 export는
+- `site/index.html`은 claude.ai 디자인 툴의 "standalone export" 결과물인데(2026-08-13부터는 루트가 아니라
+  `/mockup/` 경로로 보존만 한다), 이 export는
   기본적으로 모든 이미지·폰트를 base64로 페이지 안에 통째로 욱여넣는다. 이미지가 페이지 안에 갇혀 있으면
   브라우저 캐싱 이점을 못 받고(페이지를 새로 받을 때마다 이미지도 매번 다시 받음), 다른 프론트(customer.front
   등)에서 같은 로고를 재사용할 수도 없다.
@@ -21,7 +26,7 @@
 | 버킷 | 역할 | 비고 |
 |---|---|---|
 | `design-assets` | **스테이징 전용.** claude.ai 디자인 MCP(DesignSync)로 가져온 원본을 그대로 미러링. | 서비스가 직접 참조하면 안 됨 — 디자인 툴에서 파일이 바뀌면 이 버킷도 그대로 따라 바뀌는 사본일 뿐. |
-| `cdn` | **실제 서비스가 참조하는 프로덕션 버킷.** `design-assets`와 동일한 폴더 구조를 미러링하되, 명시적으로 검토해서 복사한 파일만 존재. | `site/index.html`을 포함해 실제 화면은 반드시 이 버킷만 참조. |
+| `cdn` | **실제 서비스가 참조하는 프로덕션 버킷.** `design-assets`와 동일한 폴더 구조를 미러링하되, 명시적으로 검토해서 복사한 파일만 존재. | Storybook 브랜딩과 `site/index.html`을 포함해 실제 화면은 반드시 이 버킷만 참조. |
 
 두 버킷 모두 내부 폴더 구조는 동일하게 맞춘다:
 
