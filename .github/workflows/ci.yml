@@ -1,7 +1,7 @@
 name: CI
 
-# posselect-ui는 ui.posselect.com(디자인 시스템 갤러리)으로 실제 배포되는 정적 사이트다.
-# main push 시 타입체크 + site/index.html을 nginx:alpine에 담아 Docker Hub로 push,
+# posselect-ui는 ui.posselect.com(디자인 시스템 문서 사이트)으로 실제 배포된다.
+# main push 시 타입체크 + Storybook 정적 빌드를 nginx:alpine에 담아 Docker Hub로 push,
 # 이 서버의 self-hosted runner가 K3s posselect-ui Deployment에 자동 반영한다.
 on:
   push:
@@ -17,8 +17,11 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - run: npm install --no-save typescript@^5 @types/react@^18 react@^18
-      - run: npx tsc --noEmit
+          cache: npm
+      # devDependencies에 typescript/@types/react/react가 선언돼 있으므로 예전처럼
+      # --no-save로 따로 끌어오지 않는다(선언된 버전과 CI가 쓰는 버전이 갈라지던 문제).
+      - run: npm ci
+      - run: npm run typecheck
 
   build:
     needs: typecheck

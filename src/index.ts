@@ -1,4 +1,5 @@
 export { Button } from './components/Button';
+export type { ButtonProps } from './components/Button';
 export { Field, Input, Textarea } from './components/Field';
 export { Card } from './components/Card';
 export { Tag } from './components/Tag';

@@ -3,7 +3,7 @@ import { BlueprintCorners } from './Blueprint';
 
 type Variant = 'primary' | 'secondary' | 'ghost';
 
-interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: Variant;
   /** btn-icon modifier — square icon-only button, combine with any variant */
   icon?: boolean;

@@ -20,18 +20,21 @@ posselect 쇼핑몰의 공통 디자인 시스템 패키지(`@posselect/ui`)다.
 
 ## 커맨드
 
-이 저장소에는 `package.json`에 `scripts`가 없다. CI(`​.github/workflows/ci.yml`)가 실제로 돌리는 명령이
-곧 개발 중 확인해야 할 명령이다.
-
 ```bash
-# 타입체크 (CI의 typecheck 잡과 동일)
-npx tsc --noEmit
+npm ci                    # 의존성 설치 (package-lock.json 사용)
+npm run typecheck         # tsc --noEmit — CI의 typecheck 잡과 동일
+npm run storybook         # Storybook 개발 서버, http://localhost:6006
+npm run build-storybook   # 정적 빌드 → storybook-static/ (배포 산출물)
 ```
 
-린트/테스트 설정과 스크립트는 존재하지 않는다(테스트 파일 없음, eslint/prettier 설정 없음) — 새로 추가하지
-않는 한 실행할 것이 없다.
+린트/테스트 설정은 존재하지 않는다(테스트 파일 없음, eslint/prettier 설정 없음).
 
-`site/index.html`을 Docker로 로컬 확인하려면:
+**Storybook 관련 3개 패키지(`storybook`, `@storybook/react-vite`, `@storybook/addon-docs`)는 캐럿(`^`)이
+아니라 정확한 버전으로 고정돼 있다.** 서로 peer로 같은 버전을 요구하는데 npm 배포 시점이 어긋나면
+(실제로 프레임워크 패키지만 먼저 올라온 상태를 만났다) `^`가 서로 다른 패치를 집어 ERESOLVE로 설치가
+깨진다 — 올릴 때는 반드시 세 개를 같은 버전으로 함께 올릴 것.
+
+배포 산출물을 Docker로 로컬 확인하려면:
 
 ```bash
 docker build -t posselect-ui . && docker run -p 8080:80 posselect-ui
@@ -52,14 +55,21 @@ docker build -t posselect-ui . && docker run -p 8080:80 posselect-ui
   조합이 카드/다이얼로그/이미지/primary·secondary 버튼에 반복된다. 모서리 마크는 현재
   `tokens.css`의 `.blueprint > .corner { display: none; }`로 렌더링만 꺼져 있을 뿐 마크업 자체는 유지되는
   중이므로, 새 컴포넌트에 프레임을 줄 때도 이 조합을 그대로 따라 넣는다(꺼져 있어도 무방).
-- **`site/`는 별도 정적 사이트**다(`ui.posselect.com`, 컴포넌트 갤러리). `src/`의 React 컴포넌트를
-  빌드해서 만든 게 아니라 claude.ai 디자인 툴의 "Standalone HTML export" 결과물을 그대로 배포한 것이라
-  `src/`와 직접적인 코드 의존 관계가 없다. `site/index.html`을 다시 내보낼 때는
-  `docs/image-cdn-policy.md`의 절차(base64 임베드 이미지를 CDN 서명 URL로 치환)를 반드시 따를 것.
-- **배포 파이프라인** (`.github/workflows/ci.yml`): main push 시 typecheck → `site/index.html`을
-  `nginx:alpine`에 담아 Docker Hub push → self-hosted runner(`k3s-home`)가 K3s `posselect-ui`
-  Deployment 이미지를 교체. `src/`의 변경 자체는 이 파이프라인에서 직접 배포되지 않는다 — 각 프론트가
-  git 의존성을 갱신(`npm update @posselect/ui` 또는 재설치)해야 반영된다.
+- **`src/stories/`는 Storybook 스토리**다(`ui.posselect.com`이 서빙하는 문서 사이트의 실체).
+  `Foundations/디자인 토큰`(컬러 램프·타이포·스페이싱·브레이크포인트·접근성)과 컴포넌트별 스토리로
+  구성된다. 새 컴포넌트를 추가하면 `src/index.ts` 배럴 export와 함께 여기 스토리도 같이 추가할 것 —
+  스토리가 없으면 문서 사이트에서 존재 자체가 보이지 않는다. 스토리 픽스처(플레이스홀더 이미지, 아이콘)는
+  `src/stories/fixtures.tsx`에 모여 있고 `src/index.ts`가 재수출하지 않으므로 공개 API에는 포함되지 않는다.
+- **`site/`는 claude.ai 디자인 툴의 "Standalone HTML export" 원본 목업**이다. 2026-08-13까지는 이게
+  `ui.posselect.com` 루트였지만(목차·앵커·라이브 프리뷰가 없어 문서 역할을 못 했다, Redmine posselect #127)
+  지금은 Storybook에 루트를 넘기고 `/mockup/` 경로로 보존만 한다 — `.storybook/main.ts`의 `staticDirs`가
+  빌드 산출물로 복사한다. 다시 내보낼 때는 `docs/image-cdn-policy.md`의 절차(base64 임베드 이미지를 CDN
+  서명 URL로 치환)를 반드시 따를 것.
+- **배포 파이프라인** (`.github/workflows/ci.yml`): main push 시 `npm ci` → typecheck → Storybook 정적
+  빌드를 `nginx:alpine`에 담아 Docker Hub push → self-hosted runner(`k3s-home`)가 K3s `posselect-ui`
+  Deployment 이미지를 교체. **주의: 이 파이프라인은 문서 사이트만 배포한다.** `src/`의 컴포넌트 변경이
+  실제 서비스 화면에 반영되려면 각 프론트(`customer.front`/`product.front`/`admin.front`/`store.front`)가
+  git 의존성을 다시 받아 재빌드·재배포해야 한다.
 
 ## 디자인 규칙 (요약 — 전체는 README.md 참고)
 
