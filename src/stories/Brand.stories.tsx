@@ -20,16 +20,29 @@ type Story = StoryObj<typeof meta>;
 
 const CDN = 'https://image.posselect.com/cdn/';
 
+/**
+ * cdn 버킷의 SVG 워드마크들은 패스로 아웃라인화된 벡터가 아니라 `<text font-family="Arial…">`,
+ * 즉 뷰어의 폰트에 의존하는 텍스트다(2026-08-14 원본 확인). `Logo` 컴포넌트가 같은 이유로
+ * Arial 기반 SVG를 걷어내고 래스터 자산으로 바꾼 적이 있다(posselect-ui `9e98c45`) — 그 문제가
+ * cdn 자산에는 그대로 남아 있다. Storybook 미리보기는 서버에 Arial이 없어도 대체 폰트로
+ * 그럴듯하게 보이므로 눈으로는 걸러지지 않는다는 점이 특히 위험하다. Redmine posselect #202.
+ */
+const SVG_TEXT_WARNING =
+  '벡터가 아니라 Arial 의존 <text>다. Arial이 없는 환경(리눅스·상당수 안드로이드)에서는 다른 폰트로 대체돼 글자 모양이 달라진다. 벡터가 필요하면 이 파일을 쓰지 말 것.';
+
 function AssetCard({
   file,
   label,
   note,
+  warn,
   background = 'light',
   height = 64,
 }: {
   file: string;
   label: string;
   note?: string;
+  /** 이 자산을 쓰기 전에 반드시 알아야 할 제약. 눈에 띄게 표시된다. */
+  warn?: string;
   background?: 'light' | 'dark' | 'checker';
   height?: number;
 }) {
@@ -59,6 +72,20 @@ function AssetCard({
       {note && (
         <div className="text-muted" style={{ fontSize: 11, marginTop: 2 }}>
           {note}
+        </div>
+      )}
+      {warn && (
+        <div
+          style={{
+            fontSize: 11,
+            marginTop: 4,
+            padding: '4px 6px',
+            background: 'var(--color-warning-bg)',
+            color: 'var(--color-neutral-900)',
+            borderLeft: '2px solid var(--color-warning)',
+          }}
+        >
+          {warn}
         </div>
       )}
       <code style={{ fontSize: 10, opacity: 0.6, wordBreak: 'break-all' }}>{file}</code>
@@ -92,16 +119,53 @@ export const AllAssets: Story = {
 
       <Section
         title="워드마크 — 기본"
-        desc="정식 컬러(코랄 Pos + 블루 Select). ® 있는 버전과 없는 버전이 나뉜다."
+        desc="정식 컬러(코랄 Pos + 블루 Select). ® 있는 버전과 없는 버전이 나뉜다. 픽셀 크기는 2026-08-14에 cdn 버킷 원본을 직접 열어 실측한 값이다."
       >
-        <AssetCard file="logos/posselect-logo.svg" label="기본 (SVG)" height={40} />
-        <AssetCard file="logos/posselect-logo.png" label="기본 (PNG)" height={40} />
-        <AssetCard file="logos/posselect-logo-hires.png" label="고해상도" height={40} />
-        <AssetCard file="logos/posselect-logo-no-r.svg" label="® 없음 (SVG)" height={40} />
-        <AssetCard file="logos/posselect-logo-no-r.png" label="® 없음 (PNG)" height={40} />
-        <AssetCard file="logos/posselect-logo-hires-no-r.png" label="® 없음 고해상도" height={40} />
-        <AssetCard file="logos/posselect-wordmark.png" label="워드마크" height={40} />
-        <AssetCard file="logos/posselect-logo-kr.svg" label="한글 버전" height={40} />
+        <AssetCard
+          file="logos/posselect-logo.svg"
+          label="기본 (SVG)"
+          height={40}
+          warn={SVG_TEXT_WARNING}
+        />
+        <AssetCard file="logos/posselect-logo.png" label="기본 (PNG)" note="426×101" height={40} />
+        <AssetCard
+          file="logos/posselect-logo-hires.png"
+          label="고해상도"
+          note="1410×300 — 기본(426×101)의 3.3배"
+          height={40}
+        />
+        <AssetCard
+          file="logos/posselect-logo-no-r.svg"
+          label="® 없음 (SVG)"
+          height={40}
+          warn={SVG_TEXT_WARNING}
+        />
+        <AssetCard
+          file="logos/posselect-logo-no-r.png"
+          label="® 없음 (PNG)"
+          note="1410×300 · 52KB"
+          height={40}
+        />
+        <AssetCard
+          file="logos/posselect-logo-hires-no-r.png"
+          label="® 없음 (PNG, -hires- 키)"
+          note="1410×300 · 52KB"
+          height={40}
+          warn="위 '® 없음 (PNG)'와 같은 1410×300이다. 이름의 -hires- 가 실제 차이를 뜻하지 않으므로 둘 중 아무거나 써도 무방."
+        />
+        <AssetCard
+          file="logos/posselect-logo-hires-no-r.webp"
+          label="® 없음 (WebP) — Logo 컴포넌트가 쓰는 자산"
+          note="1410×300 · 30KB (PNG 대비 42% 작음)"
+          height={40}
+        />
+        <AssetCard file="logos/posselect-wordmark.png" label="워드마크" note="760×460" height={40} />
+        <AssetCard
+          file="logos/posselect-logo-kr.svg"
+          label="한글 버전"
+          height={40}
+          warn="위와 같은 폰트 의존 문제 + skewX(-10)로 기울임을, stroke로 굵기를 흉내낸 SVG다. 'Apple SD Gothic Neo'/'Malgun Gothic'/'Noto Sans KR'이 없는 환경에서는 전혀 다른 글자로 보인다."
+        />
       </Section>
 
       <Section title="워드마크 — 모노톤 / 다크 배경용" desc="단색 인쇄, 다크 배경 등 컬러를 못 쓰는 맥락용.">
