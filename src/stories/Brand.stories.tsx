@@ -21,14 +21,22 @@ type Story = StoryObj<typeof meta>;
 const CDN = 'https://image.posselect.com/cdn/';
 
 /**
- * cdn 버킷의 SVG 워드마크들은 패스로 아웃라인화된 벡터가 아니라 `<text font-family="Arial…">`,
- * 즉 뷰어의 폰트에 의존하는 텍스트다(2026-08-14 원본 확인). `Logo` 컴포넌트가 같은 이유로
- * Arial 기반 SVG를 걷어내고 래스터 자산으로 바꾼 적이 있다(posselect-ui `9e98c45`) — 그 문제가
- * cdn 자산에는 그대로 남아 있다. Storybook 미리보기는 서버에 Arial이 없어도 대체 폰트로
- * 그럴듯하게 보이므로 눈으로는 걸러지지 않는다는 점이 특히 위험하다. Redmine posselect #202.
+ * cdn 버킷의 SVG 워드마크는 원래 패스로 아웃라인화된 벡터가 아니라 `<text font-family="Arial…">`,
+ * 즉 뷰어의 폰트에 의존하는 텍스트였다. `Logo` 컴포넌트가 같은 이유로 Arial 기반 SVG를 걷어내고
+ * 래스터 자산으로 바꾼 적이 있는데(posselect-ui `9e98c45`) 같은 문제가 cdn 자산에 남아 있던 것.
+ *
+ * 2026-08-14에 영문 워드마크 2종(`posselect-logo.svg`, `posselect-logo-no-r.svg`)은 진짜 벡터로
+ * 교체했다. 디자인 소스(claude.ai design 프로젝트)에도 아웃라인 벡터가 없어서 — uploads의 SVG
+ * 5개 변형이 전부 같은 Arial `<text>`였다 — 1410×300 래스터 원본을 potrace로 벡터화했다.
+ *
+ * **한글판(`posselect-logo-kr.svg`)만 아직 텍스트 기반으로 남아 있다.** 대응하는 한글 워드마크
+ * 래스터가 cdn에 없어 트레이싱할 소스가 없기 때문. Redmine posselect #202.
  */
 const SVG_TEXT_WARNING =
-  '벡터가 아니라 Arial 의존 <text>다. Arial이 없는 환경(리눅스·상당수 안드로이드)에서는 다른 폰트로 대체돼 글자 모양이 달라진다. 벡터가 필요하면 이 파일을 쓰지 말 것.';
+  '벡터가 아니라 폰트 의존 <text>다. 해당 폰트가 없는 환경에서는 다른 폰트로 대체돼 글자 모양이 달라진다. 벡터가 필요하면 이 파일을 쓰지 말 것.';
+
+/** 2026-08-14에 아웃라인 패스로 교체된 SVG에 붙이는 설명. */
+const SVG_OUTLINED_NOTE = '아웃라인 패스 벡터 · 폰트 비의존 · 확대해도 깨지지 않음';
 
 function AssetCard({
   file,
@@ -130,9 +138,10 @@ export const AllAssets: Story = {
       >
         <AssetCard
           file="logos/posselect-logo.svg"
-          label="기본 (SVG)"
+          label="기본 (SVG, 벡터)"
+          note={`4.9KB · ${SVG_OUTLINED_NOTE}`}
           height={40}
-          warn={SVG_TEXT_WARNING}
+          background="checker"
         />
         <AssetCard file="logos/posselect-logo.png" label="기본 (PNG)" note="426×101" height={40}
           background="checker" />
@@ -144,9 +153,10 @@ export const AllAssets: Story = {
         />
         <AssetCard
           file="logos/posselect-logo-no-r.svg"
-          label="® 없음 (SVG)"
+          label="® 없음 (SVG, 벡터)"
+          note={`4.4KB · ${SVG_OUTLINED_NOTE}`}
           height={40}
-          warn={SVG_TEXT_WARNING}
+          background="checker"
         />
         <AssetCard
           file="logos/posselect-logo-no-r.png"
@@ -170,9 +180,11 @@ export const AllAssets: Story = {
         <AssetCard file="logos/posselect-wordmark.png" label="워드마크" note="760×460" height={40} />
         <AssetCard
           file="logos/posselect-logo-kr.svg"
-          label="한글 버전"
+          label="한글 버전 (SVG)"
+          note="482B · 유일하게 텍스트 기반으로 남은 SVG"
           height={40}
-          warn="위와 같은 폰트 의존 문제 + skewX(-10)로 기울임을, stroke로 굵기를 흉내낸 SVG다. 'Apple SD Gothic Neo'/'Malgun Gothic'/'Noto Sans KR'이 없는 환경에서는 전혀 다른 글자로 보인다."
+          background="checker"
+          warn={`${SVG_TEXT_WARNING} 한글판은 폰트 의존에 더해 skewX(-10)로 기울임을, stroke로 굵기를 흉내내고 있어 'Apple SD Gothic Neo'/'Malgun Gothic'/'Noto Sans KR'이 없으면 전혀 다른 글자가 된다. 영문판처럼 벡터화하려면 한글 워드마크 래스터 원본이 먼저 필요하다(현재 cdn에 없음).`}
         />
       </Section>
 
