@@ -286,7 +286,7 @@ textarea.input { min-height: 90px; resize: vertical; }
   background: color-mix(in srgb, var(--color-neutral-900) 50%, transparent);
 }
 .dialog {
-  width: min(440px, 100%); display: flex; flex-direction: column; gap: var(--space-3);
+  width: min(var(--dialog-max-width, 440px), 100%); display: flex; flex-direction: column; gap: var(--space-3);
   padding: var(--space-4); border-radius: var(--radius-lg);
   background: var(--color-surface); box-shadow: var(--shadow-lg);
 }
@@ -298,7 +298,12 @@ textarea.input { min-height: 90px; resize: vertical; }
 .dialog-actions { display: flex; justify-content: flex-end; gap: var(--space-2); margin-top: var(--space-2); }
 
 .card, .btn, .input, .tag, .seg, .dialog { border-radius: 0; }
-.card, .dialog { background: transparent; border: 1px solid var(--color-divider); }
+/* dialog is excluded from the transparent/outline look below: it floats over arbitrary page
+   content, so it needs an opaque fill to stay legible (confirmed as a defect by the user —
+   modal text was unreadable with the page bleeding through). .card stays outline-only since
+   it's embedded in the page's own background, not floating above unrelated content. */
+.card { background: transparent; border: 1px solid var(--color-divider); }
+.dialog { border: 1px solid var(--color-divider); }
 .btn { border: 1px solid var(--color-divider); }
 .btn-primary { border-color: var(--color-accent); }
 .btn-ghost { border-color: transparent; }
