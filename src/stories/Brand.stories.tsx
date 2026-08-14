@@ -116,6 +116,13 @@ export const AllAssets: Story = {
         필요하면 여기서 파일명을 확인해 <code>{CDN}logos/…</code> 형태로 바로 참조하면 된다. 로고 컴포넌트로
         쓸 땐 이 URL을 직접 쓰지 말고 <code>Logo</code> 컴포넌트(Nav · Logo · Figure 페이지)를 쓴다.
       </p>
+      <p className="text-muted" style={{ maxWidth: 680 }}>
+        <b>배경은 전부 투명이다.</b> 2026-08-14까지 9개 자산(기본 워드마크, 모노톤, 스택형, 서브타이틀 포함
+        등)이 불투명한 흰 배경을 갖고 있어서 어두운 배경에 얹으면 흰 사각형이 그대로 보였다 — 흰색을 알파로
+        역산해 투명으로 전환했다(글자 테두리 안티에일리어싱은 알파에 보존). 예외는 배경색 자체가 디자인인
+        두 종류뿐이다: <code>on-dark</code>(다크 바)와 <code>square</code>(블루 정사각형). 아래 카드의
+        체커무늬가 곧 투명 영역이다.
+      </p>
 
       <Section
         title="워드마크 — 기본"
@@ -127,7 +134,8 @@ export const AllAssets: Story = {
           height={40}
           warn={SVG_TEXT_WARNING}
         />
-        <AssetCard file="logos/posselect-logo.png" label="기본 (PNG)" note="426×101" height={40} />
+        <AssetCard file="logos/posselect-logo.png" label="기본 (PNG)" note="426×101" height={40}
+          background="checker" />
         <AssetCard
           file="logos/posselect-logo-hires.png"
           label="고해상도"
@@ -169,11 +177,13 @@ export const AllAssets: Story = {
       </Section>
 
       <Section title="워드마크 — 모노톤 / 다크 배경용" desc="단색 인쇄, 다크 배경 등 컬러를 못 쓰는 맥락용.">
-        <AssetCard file="logos/posselect-logo-mono-black.png" label="모노톤 (블랙)" height={40} />
+        <AssetCard file="logos/posselect-logo-mono-black.png" label="모노톤 (블랙)" height={40}
+          background="checker" />
         <AssetCard
           file="logos/posselect-logo-mono-black-no-r.png"
           label="모노톤 (블랙, ® 없음)"
           height={40}
+          background="checker"
         />
         <AssetCard file="logos/posselect-logo-on-dark.png" label="다크 배경용" background="dark" height={40} />
         <AssetCard
@@ -186,10 +196,14 @@ export const AllAssets: Story = {
 
       <Section title="워드마크 — 정방형 / 스택형" desc="정사각 프로필 이미지, 태그라인 포함 스택 레이아웃 등.">
         <AssetCard file="logos/posselect-logo-square.png" label="정방형" height={80} />
-        <AssetCard file="logos/posselect-logo-stacked.png" label="스택형" height={80} />
-        <AssetCard file="logos/posselect-logo-stacked-no-r.png" label="스택형 (® 없음)" height={80} />
-        <AssetCard file="logos/posselect-logo-stacked-full.png" label="스택형 (태그라인 포함)" height={80} />
-        <AssetCard file="logos/posselect-logo-stacked-full-no-r.png" label="스택형 (® 없음)" height={80} />
+        <AssetCard file="logos/posselect-logo-stacked.png" label="스택형" height={80}
+          background="checker" />
+        <AssetCard file="logos/posselect-logo-stacked-no-r.png" label="스택형 (® 없음)" height={80}
+          background="checker" />
+        <AssetCard file="logos/posselect-logo-stacked-full.png" label="스택형 (태그라인 포함)" height={80}
+          background="checker" />
+        <AssetCard file="logos/posselect-logo-stacked-full-no-r.png" label="스택형 (® 없음)" height={80}
+          background="checker" />
         <AssetCard
           file="logos/posselect-logo-stacked-full-light.png"
           label="스택형 라이트"
@@ -227,25 +241,37 @@ export const AllAssets: Story = {
           note="940×300"
           height={60}
         />
-        <AssetCard file="logos/posselect-logo-with-subtitle.png" label="서브타이틀 포함" note="457×168" height={60} />
+        <AssetCard file="logos/posselect-logo-with-subtitle.png" label="서브타이틀 포함" note="457×168" height={60}
+          background="checker" />
         <AssetCard
           file="logos/posselect-logo-with-subtitle-no-r.png"
           label="서브타이틀 포함 (® 없음)"
           note="457×168"
           height={60}
+          background="checker"
         />
       </Section>
 
       <Section
         title="파비콘"
-        desc="현재 storybook.posselect.com/store.front가 쓰는 정식 파비콘은 투명배경 코랄(favicon-transparent-red-*)이다. favicon-transparent-*(빨강 없는 버전)는 초기 블루 시안으로, 최종 코랄로 교체 확정되며 남은 이전 배리에이션이다."
+        desc="현재 storybook.posselect.com/store.front가 쓰는 정식 파비콘은 코랄 P(favicon-transparent-red-*)다. 블루 P(favicon-transparent-*)는 초기 시안으로, 최종 코랄로 교체 확정되며 남은 이전 배리에이션이다. 6종 모두 배경이 투명이다 — 아래 '원형 배지'는 흰 배경이 깔린 게 아니라 파란 원이 디자인 요소이고, 원 바깥은 투명하다(2026-08-14 실측)."
       >
-        <AssetCard file="favicons/favicon-transparent-red-256.png" label="투명배경 · 코랄 (정식, 256)" background="checker" />
-        <AssetCard file="favicons/favicon-transparent-red-32.png" label="투명배경 · 코랄 (정식, 32)" background="checker" />
-        <AssetCard file="favicons/favicon-256.png" label="불투명배경 (256)" />
-        <AssetCard file="favicons/favicon-32.png" label="불투명배경 (32)" />
-        <AssetCard file="favicons/favicon-transparent-256.png" label="투명배경 · 블루 (구 시안, 256)" background="checker" />
-        <AssetCard file="favicons/favicon-transparent-32.png" label="투명배경 · 블루 (구 시안, 32)" background="checker" />
+        <AssetCard file="favicons/favicon-transparent-red-256.png" label="코랄 P (정식, 256)" note="256×256 · 배경 투명" background="checker" />
+        <AssetCard file="favicons/favicon-transparent-red-32.png" label="코랄 P (정식, 32)" note="32×32 · 배경 투명" background="checker" />
+        <AssetCard
+          file="favicons/favicon-256.png"
+          label="원형 배지 (256)"
+          note="256×256 · 파란 원 + 코랄 P, 원 바깥은 투명"
+          background="checker"
+        />
+        <AssetCard
+          file="favicons/favicon-32.png"
+          label="원형 배지 (32)"
+          note="32×32 · 파란 원 + 코랄 P, 원 바깥은 투명"
+          background="checker"
+        />
+        <AssetCard file="favicons/favicon-transparent-256.png" label="블루 P (구 시안, 256)" note="256×256 · 배경 투명" background="checker" />
+        <AssetCard file="favicons/favicon-transparent-32.png" label="블루 P (구 시안, 32)" note="32×32 · 배경 투명" background="checker" />
       </Section>
 
       <Section title="기타">
