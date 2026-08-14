@@ -55,7 +55,8 @@ docker build -t posselect-ui . && docker run -p 8080:80 posselect-ui
   조합이 카드/다이얼로그/이미지/primary·secondary 버튼에 반복된다. 모서리 마크는 현재
   `tokens.css`의 `.blueprint > .corner { display: none; }`로 렌더링만 꺼져 있을 뿐 마크업 자체는 유지되는
   중이므로, 새 컴포넌트에 프레임을 줄 때도 이 조합을 그대로 따라 넣는다(꺼져 있어도 무방).
-- **`src/stories/`는 Storybook 스토리**다(`ui.posselect.com`이 서빙하는 문서 사이트의 실체).
+- **`src/stories/`는 Storybook 스토리**다(`storybook.posselect.com`이 서빙하는 문서 사이트의 실체,
+  `ui.posselect.com`은 별칭).
   `Foundations/디자인 토큰`(컬러 램프·타이포·스페이싱·브레이크포인트·접근성)과 컴포넌트별 스토리로
   구성된다. 새 컴포넌트를 추가하면 `src/index.ts` 배럴 export와 함께 여기 스토리도 같이 추가할 것 —
   스토리가 없으면 문서 사이트에서 존재 자체가 보이지 않는다. 스토리 픽스처(플레이스홀더 이미지, 아이콘)는

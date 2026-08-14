@@ -4,7 +4,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 /**
  * `cdn` 버킷(`docs/image-cdn-policy.md`)에 있는 브랜드 이미지 배리에이션 전체를 한눈에 보여주는 페이지.
  *
- * 예전엔 `BrandLogo`(Misc.stories.tsx)가 컬러 워드마크 하나만 사이즈별로 보여줘서, 모노톤 로고/마크,
+ * 예전엔 `BrandLogo`(Misc.stories.tsx)가 컬러 워드마크 하나만 사이즈별로 보여줘서, 모노톤 로고,
  * 파비콘 배리에이션, stacked·tagline·on-dark·square 등 나머지는 실제로 MinIO cdn 버킷에 다 있는데도
  * Storybook에서는 확인할 방법이 없었다(있는 파일이 없는 것처럼 보이는 원인). 이 페이지는 새 자산을
  * 추가하는 게 아니라 기존 cdn 버킷 파일을 그대로 노출만 한다 — 각 카드는 `image.posselect.com/cdn/<key>`
@@ -85,7 +85,7 @@ export const AllAssets: Story = {
     <div style={{ padding: 28 }}>
       <h3>브랜드 자산</h3>
       <p className="text-muted" style={{ maxWidth: 680 }}>
-        MinIO <code>cdn</code> 버킷에 있는 로고·마크·파비콘 배리에이션 전체. 실제 화면에서 새 배리에이션이
+        MinIO <code>cdn</code> 버킷에 있는 로고·파비콘 배리에이션 전체. 실제 화면에서 새 배리에이션이
         필요하면 여기서 파일명을 확인해 <code>{CDN}logos/…</code> 형태로 바로 참조하면 된다. 로고 컴포넌트로
         쓸 땐 이 URL을 직접 쓰지 말고 <code>Logo</code> 컴포넌트(Nav · Logo · Figure 페이지)를 쓴다.
       </p>
@@ -132,11 +132,6 @@ export const AllAssets: Story = {
         <AssetCard file="logos/posselect-logo-tagline.png" label="태그라인 (영문)" height={60} />
         <AssetCard file="logos/posselect-logo-tagline-kr.png" label="태그라인 (한글)" height={60} />
         <AssetCard file="logos/posselect-logo-with-subtitle.png" label="서브타이틀 포함" height={60} />
-      </Section>
-
-      <Section title="마크" desc="워드마크에서 분리된 심볼만. 파비콘·앱 아이콘·소셜 프로필 등에 쓴다.">
-        <AssetCard file="marks/mark-recolored-master.png" label="마크 (컬러)" />
-        <AssetCard file="marks/mark-mono-256.png" label="마크 (모노톤)" />
       </Section>
 
       <Section

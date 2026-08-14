@@ -1,7 +1,8 @@
 import type { StorybookConfig } from '@storybook/react-vite';
 
 /**
- * ui.posselect.com이 서빙하는 것 = 이 Storybook의 정적 빌드 결과물.
+ * storybook.posselect.com(메인 주소, ui.posselect.com은 별칭으로 유지)이 서빙하는 것 =
+ * 이 Storybook의 정적 빌드 결과물.
  *
  * 예전엔 claude.ai 디자인 툴의 standalone export(`site/index.html`, 약 1MB짜리 페이지 1장)를
  * 그대로 nginx에 얹어서 서빙했는데, 목차/앵커/라이브 프리뷰/props 컨트롤이 전부 없어서 실제

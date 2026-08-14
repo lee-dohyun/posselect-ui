@@ -3,11 +3,12 @@
 posselect 쇼핑몰 공통 디자인 시스템. `customer.front` / `product.front` / `admin.front` / `store.front`가
 이 패키지 하나를 참조해 토큰과 UI 컴포넌트를 공유한다.
 
-**문서 사이트: [ui.posselect.com](https://ui.posselect.com)** — 이 저장소의 Storybook 정적 빌드다.
-컴포넌트별 라이브 프리뷰 + props 컨트롤 + 자동 추출된 설명, `Foundations/디자인 토큰`에 컬러 램프·타이포·
-스페이싱·브레이크포인트·접근성 규칙이 있다. 뷰포트 프리셋(Phone 375 / Tablet 768 / Desktop 1280)이
-`tokens.css`의 브레이크포인트와 같은 값이라 반응형 확인도 여기서 한다.
-원본 디자인 목업(claude.ai export)은 [`/mockup/`](https://ui.posselect.com/mockup/)에 그대로 남아 있다.
+**문서 사이트: [storybook.posselect.com](https://storybook.posselect.com)** — 이 저장소의 Storybook 정적
+빌드다(`ui.posselect.com`은 기존 링크 호환을 위한 별칭으로 계속 열려 있다). 컴포넌트별 라이브 프리뷰 +
+props 컨트롤 + 자동 추출된 설명, `Foundations/디자인 토큰`에 컬러 램프·타이포·스페이싱·브레이크포인트·
+접근성 규칙이 있다. 뷰포트 프리셋(Phone 375 / Tablet 768 / Desktop 1280)이 `tokens.css`의 브레이크포인트와
+같은 값이라 반응형 확인도 여기서 한다.
+원본 디자인 목업(claude.ai export)은 [`/mockup/`](https://storybook.posselect.com/mockup/)에 그대로 남아 있다.
 
 ```bash
 npm ci && npm run storybook   # 로컬 개발 서버 http://localhost:6006
