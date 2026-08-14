@@ -170,12 +170,24 @@ export const AllAssets: Story = {
 
       <Section title="워드마크 — 모노톤 / 다크 배경용" desc="단색 인쇄, 다크 배경 등 컬러를 못 쓰는 맥락용.">
         <AssetCard file="logos/posselect-logo-mono-black.png" label="모노톤 (블랙)" height={40} />
+        <AssetCard
+          file="logos/posselect-logo-mono-black-no-r.png"
+          label="모노톤 (블랙, ® 없음)"
+          height={40}
+        />
         <AssetCard file="logos/posselect-logo-on-dark.png" label="다크 배경용" background="dark" height={40} />
+        <AssetCard
+          file="logos/posselect-logo-on-dark-no-r.png"
+          label="다크 배경용 (® 없음)"
+          background="dark"
+          height={40}
+        />
       </Section>
 
       <Section title="워드마크 — 정방형 / 스택형" desc="정사각 프로필 이미지, 태그라인 포함 스택 레이아웃 등.">
         <AssetCard file="logos/posselect-logo-square.png" label="정방형" height={80} />
         <AssetCard file="logos/posselect-logo-stacked.png" label="스택형" height={80} />
+        <AssetCard file="logos/posselect-logo-stacked-no-r.png" label="스택형 (® 없음)" height={80} />
         <AssetCard file="logos/posselect-logo-stacked-full.png" label="스택형 (태그라인 포함)" height={80} />
         <AssetCard file="logos/posselect-logo-stacked-full-no-r.png" label="스택형 (® 없음)" height={80} />
         <AssetCard
@@ -192,10 +204,36 @@ export const AllAssets: Story = {
         />
       </Section>
 
-      <Section title="워드마크 — 태그라인 / 서브타이틀">
-        <AssetCard file="logos/posselect-logo-tagline.png" label="태그라인 (영문)" height={60} />
-        <AssetCard file="logos/posselect-logo-tagline-kr.png" label="태그라인 (한글)" height={60} />
-        <AssetCard file="logos/posselect-logo-with-subtitle.png" label="서브타이틀 포함" height={60} />
+      <Section
+        title="워드마크 — 태그라인 / 서브타이틀"
+        desc="태그라인은 뒤쪽 수식어를 회색(#838485)으로 눌러 앞부분을 강조한다 — 영문 'for You', 한글 '당신을 위한'이 그 자리다(한글은 어순상 앞에 온다)."
+      >
+        <AssetCard file="logos/posselect-logo-tagline.png" label="태그라인 (영문)" note="457×168" height={60} />
+        <AssetCard
+          file="logos/posselect-logo-tagline-no-r.png"
+          label="태그라인 (영문, ® 없음)"
+          note="457×168"
+          height={60}
+        />
+        <AssetCard
+          file="logos/posselect-logo-tagline-kr.png"
+          label="태그라인 (한글)"
+          note="940×300 · '당신을 위한'이 회색"
+          height={60}
+        />
+        <AssetCard
+          file="logos/posselect-logo-tagline-kr-no-r.png"
+          label="태그라인 (한글, ® 없음)"
+          note="940×300"
+          height={60}
+        />
+        <AssetCard file="logos/posselect-logo-with-subtitle.png" label="서브타이틀 포함" note="457×168" height={60} />
+        <AssetCard
+          file="logos/posselect-logo-with-subtitle-no-r.png"
+          label="서브타이틀 포함 (® 없음)"
+          note="457×168"
+          height={60}
+        />
       </Section>
 
       <Section
