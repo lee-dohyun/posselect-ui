@@ -1,4 +1,4 @@
-import { CSSProperties, MouseEvent, ReactNode } from 'react';
+import { CSSProperties, MouseEvent, ReactNode, useEffect } from 'react';
 import { BlueprintCorners } from './Blueprint';
 
 interface DialogProps {
@@ -10,9 +10,28 @@ interface DialogProps {
   maxWidth?: number;
 }
 
-/** Modal at the top elevation — matches Industry's components/dialog.html. */
+/**
+ * Modal at the top elevation — matches Industry's components/dialog.html.
+ * Fixed-height chrome (title/actions) with an internally scrolling body, so content longer
+ * than the viewport (long-form text, tall forms on a phone with the keyboard open) stays
+ * reachable instead of silently overflowing past the screen edge.
+ */
 export function Dialog({ title, children, actions, onClose, maxWidth }: DialogProps) {
   const stop = (e: MouseEvent) => e.stopPropagation();
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose?.();
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [onClose]);
+
   return (
     <div className="dialog-backdrop" onClick={onClose}>
       <div

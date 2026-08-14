@@ -286,16 +286,19 @@ textarea.input { min-height: 90px; resize: vertical; }
   background: color-mix(in srgb, var(--color-neutral-900) 50%, transparent);
 }
 .dialog {
-  width: min(var(--dialog-max-width, 440px), 100%); display: flex; flex-direction: column; gap: var(--space-3);
+  width: min(var(--dialog-max-width, 440px), 100%); max-height: min(680px, 90dvh);
+  display: flex; flex-direction: column; gap: var(--space-3);
   padding: var(--space-4); border-radius: var(--radius-lg);
   background: var(--color-surface); box-shadow: var(--shadow-lg);
 }
 .dialog-title {
   font-family: var(--font-heading); font-weight: var(--font-heading-weight);
-  font-size: 20px;
+  font-size: 20px; flex: none;
 }
-.dialog-body { font-size: 14px; opacity: 0.85; }
-.dialog-actions { display: flex; justify-content: flex-end; gap: var(--space-2); margin-top: var(--space-2); }
+/* min-height: 0 lets this flex child shrink below its content size so overflow-y can kick
+   in — without it a flex column defaults to the content's natural height and never scrolls. */
+.dialog-body { font-size: 14px; opacity: 0.85; overflow-y: auto; min-height: 0; }
+.dialog-actions { display: flex; justify-content: flex-end; gap: var(--space-2); margin-top: var(--space-2); flex: none; }
 
 .card, .btn, .input, .tag, .seg, .dialog { border-radius: 0; }
 /* dialog is excluded from the transparent/outline look below: it floats over arbitrary page
@@ -486,4 +489,13 @@ textarea.input { min-height: 90px; resize: vertical; }
   /* Below ~480px auto-fill drops to a single column; pin it to two so the storefront
      still reads as a grid. */
   .product-grid { grid-template-columns: repeat(2, 1fr); }
+
+  /* Phone-width dialogs: use the near-full screen instead of a small floating card —
+     there's no spare gutter to float it in, and it maximizes room for tall forms /
+     long-form text. Actions get a taller tap target since thumb-precision drops on phones. */
+  .dialog-backdrop { padding: var(--space-2); align-items: flex-end; }
+  .dialog { max-height: min(680px, calc(100dvh - var(--space-4))); width: 100%; }
+  /* ~44px tall, the standard minimum touch target — the base .btn is sized for a mouse
+     cursor and runs closer to 32px. */
+  .dialog-actions .btn { padding-block: var(--space-4); flex: 1; }
 }

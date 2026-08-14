@@ -40,3 +40,31 @@ export const SingleAction: Story = {
     actions: <Button variant="primary">주문내역 보기</Button>,
   },
 };
+
+/**
+ * 뷰포트보다 긴 콘텐츠(약관 전문, 긴 폼 등)가 들어가는 경우.
+ * 제목/액션은 고정, 본문(`dialog-body`)만 내부 스크롤되어 화면 밖으로 액션 버튼이
+ * 밀려나지 않는다. `maxWidth`로 기본 440px보다 넓혀 장문 텍스트의 줄바꿈을 줄였다.
+ */
+export const LongContent: Story = {
+  args: {
+    title: '이용약관',
+    maxWidth: 640,
+    children: (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+        {Array.from({ length: 14 }, (_, i) => (
+          <section key={i}>
+            <h3 style={{ marginBottom: 6, fontSize: 14 }}>{`제${i + 1}조 (조항 제목)`}</h3>
+            <p>
+              이 항목은 스토리북에서 스크롤 동작을 확인하기 위한 예시 텍스트입니다. 실제
+              약관 화면에서는 조항별 본문이 이 자리에 들어갑니다. 다이얼로그의 최대 높이를
+              넘는 콘텐츠는 본문 영역만 스크롤되고, 제목과 하단 액션 버튼은 항상 화면에
+              고정되어 보입니다.
+            </p>
+          </section>
+        ))}
+      </div>
+    ),
+    actions: <Button variant="secondary">닫기</Button>,
+  },
+};
