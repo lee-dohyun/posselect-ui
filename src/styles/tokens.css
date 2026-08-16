@@ -188,6 +188,9 @@ figcaption {
   display: block; font-size: 12px; margin-bottom: 5px;
   color: color-mix(in srgb, var(--color-text) 70%, transparent);
 }
+.field > label.required::after { content: " *"; color: var(--color-danger); }
+.field-help { font-size: 11px; margin-top: 4px; color: color-mix(in srgb, var(--color-text) 50%, transparent); }
+.field-error-text { font-size: 11px; margin-top: 4px; color: var(--color-danger); }
 .input {
   width: 100%; min-height: 36px; padding: 6px 10px; font: inherit;
   font-size: 14px; color: var(--color-text); caret-color: var(--color-accent);
@@ -196,6 +199,8 @@ figcaption {
 }
 .input:hover { border-color: color-mix(in srgb, var(--color-text) 45%, transparent); }
 .input:focus-visible { border-color: var(--color-accent); outline-offset: 0; }
+.input.input-error { border-color: var(--color-danger); }
+.input.input-error:focus-visible { border-color: var(--color-danger); }
 textarea.input { min-height: 90px; resize: vertical; }
 .radio { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; font-size: 14px; }
 .radio input, .seg-opt input {

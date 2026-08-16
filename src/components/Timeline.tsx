@@ -5,6 +5,7 @@ export interface TimelineStep {
 }
 
 interface TimelineProps {
+  /** Array of status steps to render */
   steps: TimelineStep[];
   className?: string;
 }

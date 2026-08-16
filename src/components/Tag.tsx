@@ -3,6 +3,7 @@ import { ReactNode } from 'react';
 type TagVariant = 'accent' | 'accent-2' | 'neutral' | 'outline' | 'success' | 'warning' | 'danger' | 'highlight';
 
 interface TagProps {
+  /** Semantic color theme of the badge */
   variant?: TagVariant;
   children: ReactNode;
   className?: string;

@@ -6,6 +6,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
  */
 const meta = {
   title: 'Foundations/디자인 토큰',
+  tags: ['!autodocs'],
   parameters: { layout: 'fullscreen' },
 } satisfies Meta;
 

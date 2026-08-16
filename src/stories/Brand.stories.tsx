@@ -12,6 +12,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
  */
 const meta = {
   title: 'Foundations/브랜드 자산',
+  tags: ['!autodocs'],
   parameters: { layout: 'fullscreen' },
 } satisfies Meta;
 

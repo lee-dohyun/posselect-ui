@@ -6,6 +6,7 @@ interface CardProps {
   title: string;
   children?: ReactNode;
   meta?: ReactNode;
+  /** Box-shadow z-depth magnitude */
   elevation?: 'sm' | 'md' | 'lg';
   className?: string;
 }

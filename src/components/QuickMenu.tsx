@@ -10,6 +10,7 @@ export interface QuickMenuItem {
 }
 
 interface QuickMenuProps {
+  /** Array of shortcut actions (e.g. cart, recent items) */
   items: QuickMenuItem[];
   /** Omit to hide the separate "scroll to top" button. */
   onScrollTop?: () => void;

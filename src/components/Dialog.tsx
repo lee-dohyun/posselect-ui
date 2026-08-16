@@ -1,4 +1,4 @@
-import { CSSProperties, MouseEvent, ReactNode, useEffect } from 'react';
+import { CSSProperties, MouseEvent, ReactNode, useEffect, useRef } from 'react';
 import { BlueprintCorners } from './Blueprint';
 
 interface DialogProps {
@@ -18,10 +18,32 @@ interface DialogProps {
  */
 export function Dialog({ title, children, actions, onClose, maxWidth }: DialogProps) {
   const stop = (e: MouseEvent) => e.stopPropagation();
+  const dialogRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    const previousFocus = document.activeElement as HTMLElement | null;
+    
+    if (dialogRef.current) {
+      const focusable = Array.from(dialogRef.current.querySelectorAll<HTMLElement>('a[href], button, textarea, input, select, [tabindex]:not([tabindex="-1"])'));
+      if (focusable.length > 0) focusable[0].focus();
+    }
+
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose?.();
+      if (e.key === 'Tab' && dialogRef.current) {
+        const focusable = Array.from(dialogRef.current.querySelectorAll<HTMLElement>('a[href], button, textarea, input, select, [tabindex]:not([tabindex="-1"])'));
+        if (focusable.length === 0) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
     };
     document.addEventListener('keydown', handleKeyDown);
     const previousOverflow = document.body.style.overflow;
@@ -29,12 +51,14 @@ export function Dialog({ title, children, actions, onClose, maxWidth }: DialogPr
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
       document.body.style.overflow = previousOverflow;
+      previousFocus?.focus();
     };
   }, [onClose]);
 
   return (
     <div className="dialog-backdrop" onClick={onClose}>
       <div
+        ref={dialogRef}
         className="dialog blueprint"
         role="dialog"
         aria-modal="true"

@@ -35,6 +35,26 @@ export const WithTextarea: Story = {
   decorators: [(Story) => <div style={{ width: 320 }}>{Story()}</div>],
 };
 
+export const RequiredAndHelpText: Story = {
+  args: {
+    label: '아이디',
+    required: true,
+    helpText: '영문 소문자/숫자, 4~16자',
+    children: <Input placeholder="id" />,
+  },
+  decorators: [(Story) => <div style={{ width: 320 }}>{Story()}</div>],
+};
+
+export const ErrorState: Story = {
+  args: {
+    label: '이메일',
+    required: true,
+    error: '올바른 이메일 형식이 아닙니다.',
+    children: <Input className="input-error" defaultValue="wrong-email" />,
+  },
+  decorators: [(Story) => <div style={{ width: 320 }}>{Story()}</div>],
+};
+
 export const LoginForm: Story = {
   args: { label: '폼', children: null },
   parameters: { controls: { disable: true } },

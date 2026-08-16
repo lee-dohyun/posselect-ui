@@ -5,7 +5,10 @@
  *   module.exports = { presets: [require('@posselect/ui/tailwind.config.js')], content: [...] }
  */
 module.exports = {
-  content: [],
+  content: [
+    './src/**/*.{js,ts,jsx,tsx}',
+    './.storybook/**/*.{js,ts,jsx,tsx}',
+  ],
   theme: {
     extend: {
       colors: {

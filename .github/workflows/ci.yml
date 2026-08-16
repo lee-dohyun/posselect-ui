@@ -22,6 +22,13 @@ jobs:
       # --no-save로 따로 끌어오지 않는다(선언된 버전과 CI가 쓰는 버전이 갈라지던 문제).
       - run: npm ci
       - run: npm run typecheck
+      - name: Install Playwright
+        run: npx playwright install --with-deps chromium
+      - name: Test Storybook
+        run: |
+          npx concurrently -k -s first -n "SB,TEST" -c "magenta,blue" \
+            "npm run storybook -- --no-open --port 6006" \
+            "npx wait-on tcp:127.0.0.1:6006 && npm run test-storybook"
 
   build:
     needs: typecheck

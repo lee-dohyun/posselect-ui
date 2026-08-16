@@ -20,6 +20,15 @@ export { SkeletonBlock, SkeletonCard } from './components/Skeleton';
 export { QuickMenu } from './components/QuickMenu';
 export type { QuickMenuItem } from './components/QuickMenu';
 export { WingBanner } from './components/WingBanner';
+export { Radio } from './components/Radio';
+export type { RadioProps } from './components/Radio';
+export { SegmentedControl } from './components/SegmentedControl';
+export type { SegmentedControlProps } from './components/SegmentedControl';
+export { ProductGrid } from './components/ProductGrid';
+export type { ProductGridProps } from './components/ProductGrid';
+export { ShellHeader } from './components/ShellHeader';
+export { ShellFooter } from './components/ShellFooter';
+export { SHELL_CSS } from './components/shellStyles';
 
 // CSS is not re-exported from here — consuming apps import it once at the root, e.g.:
 //   import '@posselect/ui/src/styles/tokens.css';
