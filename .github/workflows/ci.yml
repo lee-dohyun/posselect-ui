@@ -20,7 +20,7 @@ jobs:
           cache: npm
       # devDependencies에 typescript/@types/react/react가 선언돼 있으므로 예전처럼
       # --no-save로 따로 끌어오지 않는다(선언된 버전과 CI가 쓰는 버전이 갈라지던 문제).
-      - run: npm ci
+      - run: npm install
       - run: npm run typecheck
       - name: Install Playwright
         run: npx playwright install --with-deps chromium
