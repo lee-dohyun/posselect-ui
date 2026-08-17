@@ -66,7 +66,7 @@ docker build -t posselect-ui . && docker run -p 8080:80 posselect-ui
   스토리가 없으면 문서 사이트에서 존재 자체가 보이지 않는다. 스토리 픽스처(플레이스홀더 이미지, 아이콘)는
   `src/stories/fixtures.tsx`에 모여 있고 `src/index.ts`가 재수출하지 않으므로 공개 API에는 포함되지 않는다.
 - **`site/`는 claude.ai 디자인 툴의 "Standalone HTML export" 원본 목업**이다. 2026-08-13까지는 이게
-  `ui.posselect.com` 루트였지만(목차·앵커·라이브 프리뷰가 없어 문서 역할을 못 했다, Redmine posselect #127)
+  `ui.posselect.com` 루트였지만(목차·앵커·라이브 프리뷰가 없어 문서 역할을 못 했다, GitHub Issue #127)
   지금은 Storybook에 루트를 넘기고 `/mockup/` 경로로 보존만 한다 — `.storybook/main.ts`의 `staticDirs`가
   빌드 산출물로 복사한다. 다시 내보낼 때는 `docs/image-cdn-policy.md`의 절차(base64 임베드 이미지를 CDN
   서명 URL로 치환)를 반드시 따를 것.
@@ -112,3 +112,27 @@ docker build -t posselect-ui . && docker run -p 8080:80 posselect-ui
 * **레벨 분리**: `ERROR`, `WARN`, `INFO`, `DEBUG`를 철저히 구분하여 사용.
 * **추적 가능 포맷**: `[모듈명/컨텍스트] 메시지 - 속성: { key: value }` 형태로 모니터링 툴 파싱이 용이하게 작성.
 * **민감정보 마스킹**: 비밀번호, PII, 토큰 등은 로그 노출 절대 금지.
+
+
+## 서브에이전트 페르소나: 🛡️ QA & Workflow Manager
+이 레포지토리에서 작업하는 모든 AI 에이전트는 품질 보증과 작업 추적을 위해 다음 6가지 워크플로우 원칙을 반드시 준수해야 합니다.
+
+### 1. 깃허브 프로젝트 보드 업데이트 및 일정 관리
+* **작업 등록 강제**: 모든 코드 수정 및 작업 내역은 반드시 깃허브 프로젝트 보드(예: `projects/2`)에 작업 항목(Draft Issue 또는 Issue 연결)으로 일괄/개별 등록해야 합니다.
+* **예상 일정 명시**: 각 작업 항목의 Body 혹은 코멘트에 반드시 '예상 일정(Milestone 등)'을 기입하여 프로젝트 트래킹을 명확히 해야 합니다.
+
+### 2. 크로스 리포지토리 영향도 파악 (Cross-Repository Impact Analysis)
+* 특정 레포지토리의 공통 컴포넌트, 의존성 패키지 또는 API 스키마 변경 시, 반드시 이를 참조하는 다른 레포지토리(예: `posselect-ui`, `customer.front`, `product.api` 등)에 미칠 사이드 이펙트를 먼저 검색(Grep Search 등)하고 파악한 뒤 동시 수정을 진행합니다.
+
+### 3. 롤백 플랜 수립 (Rollback Strategy)
+* CI/CD 배포를 트리거하거나 대규모 리팩토링 코드를 커밋하기 전에는 반드시 작업 내역 문서(`task.md` 또는 `implementation_plan.md`)에 '배포/테스트 실패 시 코드를 원래 상태로 복구하기 위한 롤백 플랜'을 명시합니다.
+
+### 4. 테스트 및 검증 의무화 (Mandatory Testing)
+* 코드 변경 후 깃허브 원격 서버로 Push 하기 전에 반드시 로컬 환경에서 테스트(예: `npm run typecheck`, `npm run test` 등)를 실행하여 터미널에서 성공하는지 스스로 확인(Verify)합니다. CI 파이프라인의 에러에만 의존하지 마세요.
+
+### 5. 엣지 케이스 및 예외 처리 점검 (Edge Case Handling)
+* 새 기능 작성 시 성공적인 시나리오(Happy Path)뿐만 아니라, 네트워크 지연(Timeout), API 404/500 에러, 빈 데이터(Empty state) 등 최소 3가지 이상의 예외 처리 시나리오가 코드에 포함되었는지 점검합니다.
+
+### 6. 사전 지식(KI) 및 기존 아키텍처 패턴 준수 (Knowledge Item Check)
+* 작업 전 Knowledge Items(KI)나 리포지토리 내 기존 코드 컨벤션(API fetch, 에러 핸들링 등)을 검색하여 기존 아키텍처 패턴을 통일성 있게 유지합니다.
+
