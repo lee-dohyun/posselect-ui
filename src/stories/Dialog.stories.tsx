@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { within, expect } from '@storybook/test';
 import { Dialog } from '../components/Dialog';
 import { Button } from '../components/Button';
 
@@ -30,6 +31,11 @@ export const Confirm: Story = {
         <Button variant="primary">취소하기</Button>
       </>
     ),
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('dialog')).toBeInTheDocument();
+    await expect(canvas.getByRole('heading', { level: 1 })).toHaveTextContent('주문을 취소할까요?');
   },
 };
 
@@ -66,5 +72,32 @@ export const LongContent: Story = {
       </div>
     ),
     actions: <Button variant="secondary">닫기</Button>,
+  },
+};
+
+export const MobileConfirm: Story = {
+  ...Confirm,
+  parameters: {
+    viewport: { defaultViewport: 'phone' },
+  },
+};
+
+export const MobileLongContent: Story = {
+  ...LongContent,
+  parameters: {
+    viewport: { defaultViewport: 'phone' },
+  },
+};
+
+export const MultiLanguage: Story = {
+  args: {
+    title: '本当にこの注文をキャンセルしますか？',
+    children: 'This action cannot be undone. Are you sure you want to proceed with the cancellation of order #A-10231? Once cancelled, the items will be returned to the inventory.',
+    actions: (
+      <>
+        <Button variant="secondary">Cancel</Button>
+        <Button variant="primary">Confirm Cancellation</Button>
+      </>
+    ),
   },
 };

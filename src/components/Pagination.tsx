@@ -6,7 +6,7 @@ interface PaginationProps {
 }
 
 /** Builds the page-number list with a single ellipsis, e.g. [1, '…', 4, 5, 6, '…', 12]. */
-function pageList(page: number, totalPages: number): (number | '…')[] {
+export function pageList(page: number, totalPages: number): (number | '…')[] {
   const pages = new Set<number>([1, totalPages, page, page - 1, page + 1]);
   const sorted = [...pages].filter((p) => p >= 1 && p <= totalPages).sort((a, b) => a - b);
   const result: (number | '…')[] = [];

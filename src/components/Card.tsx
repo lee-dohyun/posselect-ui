@@ -14,6 +14,7 @@ interface CardProps {
 /**
  * Blueprint-style card — hairline border + corner registration marks,
  * matching Industry's components/cards.html.
+ * (Note: Corner marks markup is maintained, but visually hidden by `.corner { display: none }`)
  */
 export function Card({ kicker, title, children, meta, elevation = 'sm', className = '' }: CardProps) {
   return (

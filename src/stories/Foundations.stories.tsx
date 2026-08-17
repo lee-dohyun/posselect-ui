@@ -163,6 +163,42 @@ export const Breakpoints: Story = {
 };
 
 /**
+ * React 컴포넌트 래퍼 없이 CSS 클래스만으로 동작하는 패턴들을 설명합니다.
+ */
+export const CssClasses: Story = {
+  render: () => (
+    <div style={{ padding: 28, maxWidth: 680 }}>
+      <h3>CSS 클래스</h3>
+      <p className="text-muted">React 컴포넌트를 사용하지 않고 직접 요소에 클래스를 지정해 쓰는 패턴입니다.</p>
+
+      <h5 style={{ marginTop: 28 }}>유틸리티 및 래퍼</h5>
+      <ul style={{ marginBottom: 20 }}>
+        <li><code>.container</code>: 페이지의 최대 폭(maxWidth)을 지정하고 중앙에 배치하며, 뷰포트에 따라 좌우 패딩을 조절합니다.</li>
+        <li><code>.hr</code>: 테두리가 아닌 면으로 그려지는 얇은 구분선입니다.</li>
+        <li><code>.text-muted</code>: 부가 설명이나 약관 등에 쓰이는 회색 텍스트입니다.</li>
+        <li><code>.product-grid</code>: 주로 Card를 감싸서 데스크톱 4열 / 모바일 2열(고정) 형태의 상품 목록을 구성합니다.</li>
+      </ul>
+
+      <h5>그림자 깊이 (<code>.elev-*</code>)</h5>
+      <p className="text-muted">Card 컴포넌트에 간접적으로 노출되는 그림자 단계입니다.</p>
+      <div style={{ display: 'flex', gap: 20, marginBottom: 28, flexWrap: 'wrap' }}>
+        <div className="card elev-sm" style={{ padding: 20 }}>.elev-sm (기본)</div>
+        <div className="card elev-md" style={{ padding: 20 }}>.elev-md (호버/활성)</div>
+        <div className="card elev-lg" style={{ padding: 20 }}>.elev-lg (다이얼로그 등 최상위)</div>
+      </div>
+
+      <h5>이미지 가공 패턴</h5>
+      <p className="text-muted">Figure 안에서 사용되는 이미지 블렌딩 효과입니다.</p>
+      <div style={{ display: 'flex', gap: 20, marginBottom: 20, flexWrap: 'wrap' }}>
+        <div className="duotone" style={{ width: 150, height: 100, background: 'url(https://via.placeholder.com/150) center/cover' }}>.duotone</div>
+        <div className="halftone" style={{ width: 150, height: 100, background: 'url(https://via.placeholder.com/150) center/cover' }}>.halftone</div>
+        <div className="plate" style={{ width: 150, height: 100, background: 'url(https://via.placeholder.com/150) center/cover' }}>.plate</div>
+      </div>
+    </div>
+  ),
+};
+
+/**
  * README의 접근성 규칙을 pass/fail 예시로 나란히 둔 페이지.
  */
 export const Accessibility: Story = {

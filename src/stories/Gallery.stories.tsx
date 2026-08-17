@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { within, userEvent, expect } from '@storybook/test';
 import { Gallery } from '../components/Gallery';
 import { placeholder } from './fixtures';
 
@@ -31,6 +32,17 @@ export const Default: Story = {
     ],
   },
   decorators: [(Story) => <div style={{ width: 420 }}>{Story()}</div>],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const thumbnails = canvas.getAllByRole('button');
+    
+    // Click second thumbnail
+    await userEvent.click(thumbnails[1]);
+    
+    // Check if main image updated
+    const mainImage = canvas.getAllByRole('img')[0];
+    await expect(mainImage).toHaveAttribute('alt', '무선 이어폰 Pro 측면');
+  },
 };
 
 /** 썸네일이 5개 미만이면 그리드가 비는 형태를 확인. */

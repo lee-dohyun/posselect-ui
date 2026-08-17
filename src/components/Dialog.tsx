@@ -1,4 +1,4 @@
-import { CSSProperties, MouseEvent, ReactNode, useEffect, useRef } from 'react';
+import { CSSProperties, MouseEvent, ReactNode, useEffect, useRef, useId } from 'react';
 import { BlueprintCorners } from './Blueprint';
 
 interface DialogProps {
@@ -19,6 +19,7 @@ interface DialogProps {
 export function Dialog({ title, children, actions, onClose, maxWidth }: DialogProps) {
   const stop = (e: MouseEvent) => e.stopPropagation();
   const dialogRef = useRef<HTMLDivElement>(null);
+  const titleId = useId();
 
   useEffect(() => {
     const previousFocus = document.activeElement as HTMLElement | null;
@@ -62,12 +63,12 @@ export function Dialog({ title, children, actions, onClose, maxWidth }: DialogPr
         className="dialog blueprint"
         role="dialog"
         aria-modal="true"
-        aria-labelledby="ds-dialog-title"
+        aria-labelledby={titleId}
         onClick={stop}
         style={maxWidth ? ({ '--dialog-max-width': `${maxWidth}px` } as CSSProperties) : undefined}
       >
         <BlueprintCorners />
-        <div className="dialog-title" id="ds-dialog-title">{title}</div>
+        <div className="dialog-title" id={titleId}>{title}</div>
         <div className="dialog-body">{children}</div>
         {actions && <div className="dialog-actions">{actions}</div>}
       </div>

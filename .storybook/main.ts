@@ -19,6 +19,12 @@ const config: StorybookConfig = {
     options: {},
   },
   staticDirs: [{ from: '../site', to: '/mockup' }],
+  refs: {
+    'posselect-shell': {
+      title: 'Shell (Header/Footer)',
+      url: process.env.NODE_ENV === 'development' ? 'http://localhost:6007' : 'https://shell.posselect.com/storybook',
+    },
+  },
 };
 
 export default config;
