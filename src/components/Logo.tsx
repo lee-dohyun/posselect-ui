@@ -1,6 +1,7 @@
-interface LogoProps {
-  /** px, rendered height of the wordmark */
+export interface LogoProps {
+  /** 렌더링될 워드마크의 높이 (px) */
   size?: number;
+  /** 추가 CSS 클래스 */
   className?: string;
 }
 

@@ -35,7 +35,7 @@ export const Confirm: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await expect(canvas.getByRole('dialog')).toBeInTheDocument();
-    await expect(canvas.getByRole('heading', { level: 1 })).toHaveTextContent('주문을 취소할까요?');
+    await expect(canvas.getByRole('heading', { level: 2 })).toHaveTextContent('주문을 취소할까요?');
   },
 };
 

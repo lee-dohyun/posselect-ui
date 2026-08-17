@@ -68,7 +68,7 @@ export function Dialog({ title, children, actions, onClose, maxWidth }: DialogPr
         style={maxWidth ? ({ '--dialog-max-width': `${maxWidth}px` } as CSSProperties) : undefined}
       >
         <BlueprintCorners />
-        <div className="dialog-title" id={titleId}>{title}</div>
+        <h2 className="dialog-title" id={titleId}>{title}</h2>
         <div className="dialog-body">{children}</div>
         {actions && <div className="dialog-actions">{actions}</div>}
       </div>

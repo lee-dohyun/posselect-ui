@@ -178,7 +178,7 @@ export const AllAssets: Story = {
           note="1410×300 · 30KB (PNG 대비 42% 작음)"
           height={40}
         />
-        <AssetCard file="logos/posselect-wordmark.png" label="워드마크" note="760×460" height={40} />
+
         <AssetCard
           file="logos/posselect-logo-kr.svg"
           label="한글 버전 (SVG)"
@@ -288,7 +288,6 @@ export const AllAssets: Story = {
       </Section>
 
       <Section title="기타">
-        <AssetCard file="misc/posselect-ci.png" label="CI 보드" height={90} />
         <AssetCard file="misc/_v_check.png" label="검수용 참고 이미지" height={90} />
       </Section>
     </div>

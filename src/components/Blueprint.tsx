@@ -3,6 +3,8 @@
  * (`.blueprint` + `<i class="corner tl/tr/bl/br">`). Industry readme.md:
  * "Do not drop the registration marks from a framed element."
  * (Note: Currently hidden in posselect via `.corner { display: none }`)
+ *
+ * @component
  */
 export function BlueprintCorners() {
   return (

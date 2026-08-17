@@ -1,8 +1,11 @@
 import { BlueprintCorners } from './Blueprint';
 
-interface FigureProps {
+export interface FigureProps {
+  /** 이미지 URL 주소 */
   src: string;
+  /** 이미지 대체 텍스트 */
   alt: string;
+  /** 이미지 하단 캡션 */
   caption?: string;
 }
 

@@ -50,7 +50,7 @@ export const ErrorState: Story = {
     label: '이메일',
     required: true,
     error: '올바른 이메일 형식이 아닙니다.',
-    children: <Input className="input-error" defaultValue="wrong-email" />,
+    children: <Input defaultValue="wrong-email" />,
   },
   decorators: [(Story) => <div style={{ width: 320 }}>{Story()}</div>],
 };
