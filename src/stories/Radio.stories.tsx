@@ -22,6 +22,7 @@ export const Default: Story = {
 };
 
 export const Group: Story = {
+  args: {} as any,
   render: () => (
     <div style={{ display: 'flex', gap: '16px' }}>
       <Radio name="group1" label="Credit Card" value="cc" defaultChecked />

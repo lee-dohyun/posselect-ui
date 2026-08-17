@@ -15,6 +15,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
+  args: {} as any,
   render: () => (
     <ProductGrid>
       {[1, 2, 3, 4, 5, 6].map((item) => (
@@ -34,6 +35,7 @@ export const Mobile: Story = {
 };
 
 export const MultiLanguage: Story = {
+  args: {} as any,
   render: () => (
     <ProductGrid>
       <Card title="非常に長い日本語の商品名テスト・レイアウトが崩れないか確認します">
