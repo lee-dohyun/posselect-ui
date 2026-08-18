@@ -23,7 +23,7 @@
     "@storybook/addon-a11y": "10.5.7",
     "@storybook/addon-docs": "10.5.7",
     "@storybook/react-vite": "10.5.7",
-    "@storybook/test": "10.5.7",
+    "@storybook/test": "^8.6.15",
     "@storybook/test-runner": "^0.19.1",
     "@types/react": "^19",
     "@types/react-dom": "^19",
