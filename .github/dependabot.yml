@@ -1,0 +1,20 @@
+version: 2
+updates:
+  # npm dependencies (Storybook design-system doc site) — SCA rollout per architecture#15 / architecture#17
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+
+  # Keep the GitHub Actions workflow files themselves patched too
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "ci"
