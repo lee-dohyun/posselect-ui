@@ -28,6 +28,9 @@ jobs:
     needs: typecheck
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
     steps:
       - uses: actions/checkout@v4
 
@@ -48,6 +51,33 @@ jobs:
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/posselect-ui:latest
             ${{ secrets.DOCKERHUB_USERNAME }}/posselect-ui:${{ github.sha }}
+
+      # DevSecOps SCA rollout (architecture#15 / architecture#17): scan the image we just
+      # built/pushed for known OS + npm vulnerabilities. Report-only for now —
+      # TODO: once findings are triaged, set exit-code: '1' with
+      # severity: 'CRITICAL,HIGH' to actually gate the build/deploy.
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: ${{ secrets.DOCKERHUB_USERNAME }}/posselect-ui:${{ github.sha }}
+          format: "sarif"
+          output: "trivy-results.sarif"
+          severity: "CRITICAL,HIGH,MEDIUM"
+          exit-code: "0"
+
+      - name: Upload Trivy scan results as workflow artifact
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: trivy-results-${{ github.sha }}
+          path: trivy-results.sarif
+          retention-days: 30
+
+      - name: Upload Trivy scan results to GitHub Code Scanning
+        if: always()
+        uses: github/codeql-action/upload-sarif@v4.37.7
+        with:
+          sarif_file: "trivy-results.sarif"
 
   deploy:
     needs: build
