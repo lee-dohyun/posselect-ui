@@ -26,6 +26,8 @@ export { SegmentedControl } from './components/SegmentedControl';
 export type { SegmentedControlProps } from './components/SegmentedControl';
 export { ProductGrid } from './components/ProductGrid';
 export type { ProductGridProps } from './components/ProductGrid';
+export { Carousel } from './components/Carousel';
+export type { CarouselProps } from './components/Carousel';
 
 
 // CSS is not re-exported from here — consuming apps import it once at the root, e.g.:
