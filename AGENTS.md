@@ -105,7 +105,7 @@ docker build -t posselect-ui . && docker run -p 8080:80 posselect-ui
 
 ---
 
-<!-- canon:begin sha=10744dafb2fa src=~/msa/AGENTS.md -->
+<!-- canon:begin sha=e5b6d5329e5d src=~/msa/AGENTS.md -->
 ## 공통 캐논 (모든 AI 도구 공통)
 
 > **공통 캐논 (자동 주입 — 손으로 고치지 말 것).** 원본은 `~/msa/AGENTS.md`이고 이 블록은
@@ -189,6 +189,13 @@ docker build -t posselect-ui . && docker run -p 8080:80 posselect-ui
 ```
 
 Claude Code 는 SessionStart 훅이 자동 실행한다(로컬 모드). **훅이 없는 도구는 세션의 첫 명령으로 직접 실행할 것.**
+
+- Project #2 조회 결과는 세션 간 공유 캐시(기본 5분, `~/.cache/msa-agent/`)를 쓴다. `gh project` 계열은 전부
+  GraphQL 이고 REST 와 한도가 분리돼 있는데 이 머신은 세션이 10~15개 동시에 뜬다 — 캐시가 없으면
+  세션 시작 조회만으로 GraphQL 5000/hr 이 마른다(2026-08-21 실측: 58/5000 까지 떨어짐).
+- **"조회 실패"와 "진행 중 작업 없음"은 다르다.** 한도가 소진되면 스크립트가 실패를 명시하고 낡은 캐시라도
+  보여준다. 실패 표시가 뜨면 착수 전에 대상 이슈를 직접 열어 CLAIM 코멘트를 확인할 것 — 조회 실패를
+  "아무도 안 잡았다"로 읽으면 그대로 중복 착수다.
 
 ### 코멘트 규격 (기계 판독용 첫 줄 + 사람이 읽는 본문)
 
