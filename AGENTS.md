@@ -105,7 +105,7 @@ docker build -t posselect-ui . && docker run -p 8080:80 posselect-ui
 
 ---
 
-<!-- canon:begin sha=7ea99a43c561 src=~/msa/AGENTS.md -->
+<!-- canon:begin sha=10744dafb2fa src=~/msa/AGENTS.md -->
 ## 공통 캐논 (모든 AI 도구 공통)
 
 > **공통 캐논 (자동 주입 — 손으로 고치지 말 것).** 원본은 `~/msa/AGENTS.md`이고 이 블록은
@@ -200,7 +200,9 @@ Claude Code 는 SessionStart 훅이 자동 실행한다(로컬 모드). **훅이
 | `TAKEOVER` | 남의 스테일 클레임을 인수할 때 | `~/msa/scripts/claim.sh <repo> <issue> --takeover` |
 
 - 코멘트 첫 줄은 ```CLAIM tool=... branch=... started=...``` 형태로 고정된다. 손으로 쓰지 말고 스크립트를 쓸 것 — 포맷이 깨지면 다른 세션의 클레임 판정이 틀린다.
-- **실행 도구 식별**: 스크립트가 환경변수로 자동 판별한다. Codex/Antigravity 처럼 판별이 안 되는 도구는 셸에 `export AGENT_TOOL=codex`(또는 `antigravity`)를 설정하거나 `--tool` 로 지정한다.
+- **실행 도구 식별은 자동이다 — 세션마다 뭘 설정할 필요 없다.** 스크립트가 `/proc` 조상 체인에서 이 셸을 띄운 주체(ccd-cli / codex / antigravity IDE 서버 …)를 찾아 판별한다. 환경변수는 자식으로 새기 때문에(Claude 세션 안에서 codex 를 띄우면 `CLAUDECODE` 를 물려받는다) 조상 체인을 먼저 본다.
+  - 판별 결과가 `unknown` 으로 남는 도구가 생기면, 그때마다 `AGENT_TOOL` 을 치지 말고 **`~/msa/scripts/lib/agent-protocol.sh` 의 `_agent_ancestry_scan()` 에 패턴 한 줄을 추가**한다(한 번만 하면 그 도구의 모든 세션에 적용된다).
+  - 일회성으로 다르게 기록해야 할 때만 `AGENT_TOOL=... ` 또는 `--tool` 로 덮어쓴다.
 
 ### 스테일 클레임 만료 (2시간)
 
