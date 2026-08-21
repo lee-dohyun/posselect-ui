@@ -31,14 +31,24 @@ npm run storybook         # Storybook 개발 서버, http://localhost:6006
 npm run build-storybook   # 정적 빌드 → storybook-static/ (배포 산출물)
 ```
 
-**테스트는 존재하지만 아무것도 자동으로 돌리지 않는다** — 이 상태를 정확히 알고 있을 것:
-- `src/components/Pagination.test.ts`가 vitest로 `pageList()` 순수 함수를 검증한다. 그런데 `package.json`에
-  `test` 스크립트도 `vitest.config.*`도 없어서 **어디서도 실행되지 않는다.** 직접 돌리려면 `npx vitest run`.
+**vitest는 배선돼 있다** (posselect-ui#28, 2026-08-21):
+- `npm test`(`vitest run`)가 `package.json` `scripts`에 있고 `vitest.config.ts`(jsdom 환경 +
+  `@vitejs/plugin-react`)도 있다. `pr-check.yml`의 조건부 테스트 게이트가 이제 실제로 돈다.
+- `src/components/Pagination.test.ts`(순수 함수 `pageList()`)와 `src/components/Tag.test.tsx`
+  (`@testing-library/react`로 렌더링 + className 검증) 2개 테스트 파일이 있다. 새 컴포넌트/순수 함수를
+  추가하면 같은 패턴으로 테스트를 같이 추가할 것 — TDD 캐논(아래 §"TDD / AI 에이전트 테스트 프로토콜")
+  대상이다.
+- `npm run test:coverage`(`vitest run --coverage`, `@vitest/coverage-v8`)는 `pr-check.yml`에서
+  리포트만 하고 빌드를 막지 않는다(아티팩트로 업로드). 임계값 게이트는 아직 없다.
 - 스토리 12개(`Button`/`Dialog`/`Pagination`/`Field`/`Gallery`/`Skeleton` 등)에 `play:` 인터랙션이
-  붙어 있고 `npm run test-storybook`(`@storybook/test-runner` + playwright)이 이를 실행한다. 이것도
-  CI에는 없다 — Storybook 서버가 떠 있어야 한다.
-- CI(`.github/workflows/ci.yml`)가 실제로 돌리는 검증은 `npm run typecheck` 하나뿐이다. 즉 **CI 통과는
-  동작이 멀쩡하다는 증거가 아니다.** 컴포넌트 로직을 건드렸으면 위 두 명령을 직접 실행해 확인할 것.
+  붙어 있고 `npm run test-storybook`(`@storybook/test-runner` + playwright)이 이를 실행한다. 이건
+  여전히 CI에 없다 — Storybook 서버가 떠 있어야 한다.
+- CI(`.github/workflows/ci.yml`, main push 배포용)가 실제로 돌리는 검증은 여전히 `npm run typecheck`
+  하나뿐이다 — 테스트 게이트는 `pr-check.yml`(PR 단계)에만 있다. 컴포넌트 로직을 건드렸으면
+  `npm test`/`npm run test-storybook`을 직접 실행해 확인할 것.
+- `@vitejs/plugin-react`는 이 저장소의 `vite ^7` 고정과 맞춰 `5.x`로 둘 것 — `6.x`부터는 `vite ^8`을
+  요구해 `ERR_PACKAGE_PATH_NOT_EXPORTED`로 vitest 구동 자체가 깨진다. `@vitest/coverage-v8`도
+  `vitest`(현재 `4.1.10`)와 마이너까지 맞출 것 — 어긋나면 "Running mixed versions" 경고가 뜬다.
 
 eslint/prettier 설정은 여전히 없다.
 
@@ -105,7 +115,7 @@ docker build -t posselect-ui . && docker run -p 8080:80 posselect-ui
 
 ---
 
-<!-- canon:begin sha=2327991ef5aa src=~/msa/AGENTS.md -->
+<!-- canon:begin sha=7ab837cdce2d src=~/msa/AGENTS.md -->
 ## 공통 캐논 (모든 AI 도구 공통)
 
 > **공통 캐논 (자동 주입 — 손으로 고치지 말 것).** 원본은 `~/msa/AGENTS.md`이고 이 블록은
@@ -135,6 +145,14 @@ docker build -t posselect-ui . && docker run -p 8080:80 posselect-ui
 - **모든 상태 변경(쓰기) API는 멱등해야 한다.** 재시도/중복 호출이 이중 차감·이중 결제가 되지 않게 멱등성 키(예: orderId) 기반 dedup을 넣는다 (posselect #211).
 - 클래스 레벨 `@Transactional(readOnly = true)`인 클래스에 쓰기 경로 추가 금지 — 전파 함정으로 UPDATE가 조용히 사라진다. 쓰기는 별도 클래스 또는 `REQUIRES_NEW` (posselect #211 롤백 사례).
 - **트랜잭션 전파·멱등성 변경은 단위 테스트로 검증이 성립하지 않는다.** 실제 DB 상태 변화 실측(같은 키로 2회 호출 → 1회만 반영)으로 검증하고, 실측 후 데이터 원복까지 한 세트로 수행 (posselect #211).
+
+### TDD / AI 에이전트 테스트 프로토콜
+- 새 기능·버그 수정은 가능한 범위에서 **실패하는 테스트 먼저 작성 → 통과하도록 구현 → 리팩터링** 순서로 진행한다. 순수 설정/인프라 변경처럼 테스트로 표현되지 않는 작업은 예외.
+- Test Pyramid: Unit(JUnit5/Vitest, 가장 많이) → Integration(Testcontainers 실DB, 서비스 경계 검증) → E2E(Playwright, 핵심 플로우만 적게). 계층별 책임과 저장소별 현황은 `architecture` 저장소 `docs/2026-08-21-test-pyramid-strategy.md` 참고.
+- **위 "트랜잭션 / 정합성" 절의 예외가 여기도 그대로 적용된다** — 트랜잭션 전파·멱등성 변경은 단위 테스트로 검증이 성립하지 않으므로 실제 DB 상태 실측으로 검증한다.
+- **커버리지는 리포트만 하고 게이트로 쓰지 않는다(2026-08-21 결정).** 대부분 저장소가 0%에서 시작해 즉시 임계값을 걸면 모든 PR이 막힌다 — CI가 커버리지를 아티팩트로 남기고, 수치가 쌓이면 추후 임계값 도입을 재검토한다.
+- 기존 테스트가 있는 저장소는 `verify.sh`(§5-1)가 이미 push 전 실행을 강제한다 — 새 테스트를 추가하는 순간부터 자동으로 강제 대상이 된다. 별도 CI 배선이 필요 없다.
+- 근거: architecture#14(장기 개선, TDD 도입), posselect-shell#26(Testcontainers 통합 테스트 표준, posselect #211 readOnly 전파 롤백 사례에서 도출).
 
 ### 보안 / 인가
 - **사용자 식별 키는 Keycloak sub(`X-User-Id`)만.** 이메일은 변경 가능하므로 소유자 키로 쓰지 않는다 (posselect #210).

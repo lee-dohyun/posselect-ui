@@ -44,6 +44,16 @@ jobs:
       - name: Test
         if: steps.scripts.outputs.test == 'true'
         run: npm test
+      - name: Coverage (report-only)
+        if: steps.scripts.outputs.test == 'true'
+        run: npm run test:coverage
+      - name: Upload coverage report
+        if: steps.scripts.outputs.test == 'true'
+        uses: actions/upload-artifact@v7
+        with:
+          name: coverage-report
+          path: coverage/
+          retention-days: 14
       - name: Report missing gates
         run: |
           [ "${{ steps.scripts.outputs.typecheck }}" = "true" ] || echo "::warning::typecheck 스크립트가 없어 타입 검사를 건너뛰었습니다."

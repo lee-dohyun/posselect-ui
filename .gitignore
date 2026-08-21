@@ -1,5 +1,6 @@
 node_modules/
 storybook-static/
+coverage/
 
 # Claude Code session worktrees (gitlink으로 통째 커밋되는 사고 방지, ~/msa/AGENTS.md 참고)
 .claude/worktrees/
