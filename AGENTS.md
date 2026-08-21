@@ -31,7 +31,16 @@ npm run storybook         # Storybook 개발 서버, http://localhost:6006
 npm run build-storybook   # 정적 빌드 → storybook-static/ (배포 산출물)
 ```
 
-린트/테스트 설정은 존재하지 않는다(테스트 파일 없음, eslint/prettier 설정 없음).
+**테스트는 존재하지만 아무것도 자동으로 돌리지 않는다** — 이 상태를 정확히 알고 있을 것:
+- `src/components/Pagination.test.ts`가 vitest로 `pageList()` 순수 함수를 검증한다. 그런데 `package.json`에
+  `test` 스크립트도 `vitest.config.*`도 없어서 **어디서도 실행되지 않는다.** 직접 돌리려면 `npx vitest run`.
+- 스토리 12개(`Button`/`Dialog`/`Pagination`/`Field`/`Gallery`/`Skeleton` 등)에 `play:` 인터랙션이
+  붙어 있고 `npm run test-storybook`(`@storybook/test-runner` + playwright)이 이를 실행한다. 이것도
+  CI에는 없다 — Storybook 서버가 떠 있어야 한다.
+- CI(`.github/workflows/ci.yml`)가 실제로 돌리는 검증은 `npm run typecheck` 하나뿐이다. 즉 **CI 통과는
+  동작이 멀쩡하다는 증거가 아니다.** 컴포넌트 로직을 건드렸으면 위 두 명령을 직접 실행해 확인할 것.
+
+eslint/prettier 설정은 여전히 없다.
 
 **Storybook 관련 3개 패키지(`storybook`, `@storybook/react-vite`, `@storybook/addon-docs`)는 캐럿(`^`)이
 아니라 정확한 버전으로 고정돼 있다.** 서로 peer로 같은 버전을 요구하는데 npm 배포 시점이 어긋나면
@@ -52,6 +61,11 @@ docker build -t posselect-ui . && docker run -p 8080:80 posselect-ui
 - **`src/styles/tokens.css`** ↔ **`tailwind.config.js`**: 같은 디자인 토큰(색상 ramp, spacing, radius,
   shadow)을 두 형식으로 중복 정의한 쌍. CSS 변수(`.btn`, `.card`, `.tag` 등 순수 클래스 사용처용)와
   Tailwind preset(유틸리티 클래스 사용처용) 둘 다 지원하기 위함 — 하나를 고치면 반드시 다른 하나도 고칠 것.
+  기계적 대조는 `.claude/hooks/check-token-mirror.sh`가 한다(두 파일 중 하나를 편집하면 PostToolUse 훅으로
+  자동 실행되고, 단독 실행도 된다). 이 스크립트는 hex 색상 집합 비교에 더해 `src/` 어디서든 참조하지만
+  `tokens.css`에 정의되지 않은 `var(--...)`도 잡는다 — hero 배너 인시던트(정의 안 된 변수는 에러 없이
+  조용히 무시되어 배경이 투명해진다)의 재발 방지용이다. 토큰/컴포넌트를 손볼 땐
+  `.claude/agents/ui-token-guard.md` 서브에이전트를 쓸 것.
 - **컴포넌트는 순수 CSS 클래스의 얇은 React 래퍼**다. 로직보다 `className` 조합이 대부분이며(예:
   `Button.tsx`), 실제 스타일은 전부 `tokens.css`에 있다. 새 컴포넌트를 짤 때도 이 패턴(클래스 조합 +
   최소 상태)을 따를 것 — CSS-in-JS나 별도 스타일 파일을 추가하지 않는다.
