@@ -105,7 +105,7 @@ docker build -t posselect-ui . && docker run -p 8080:80 posselect-ui
 
 ---
 
-<!-- canon:begin sha=e5b6d5329e5d src=~/msa/AGENTS.md -->
+<!-- canon:begin sha=2327991ef5aa src=~/msa/AGENTS.md -->
 ## 공통 캐논 (모든 AI 도구 공통)
 
 > **공통 캐논 (자동 주입 — 손으로 고치지 말 것).** 원본은 `~/msa/AGENTS.md`이고 이 블록은
@@ -227,6 +227,35 @@ Claude Code 는 SessionStart 훅이 자동 실행한다(로컬 모드). **훅이
 | 확정된 개발 규칙 | `~/msa/AGENTS.md` (이 문서) |
 | 사고 기록·ADR 등 장기 지식 | GitHub Wiki(gateway/order.api) |
 | 도구 자신의 작업 효율용 메모 | 각 도구의 메모리 — **다른 도구는 못 읽는다는 전제로만 사용** |
+
+
+## 4-2. 작업 라우팅 — 어느 도구가 무엇을 하나
+
+간단한 작업은 Antigravity 가 처리하고, 나머지는 Claude/Codex 가 맡는다. 표시는 **GitHub 라벨**로 한다.
+
+| 라벨 | 뜻 |
+|------|-----|
+| `agent: Antigravity` | 간단한 작업 — Antigravity 우선 |
+| `agent: Claude` / `agent: Codex` | 그 도구가 맡을 작업 |
+| (라벨 없음) | 아무 도구나 — **기본값이므로 대부분의 이슈는 라벨을 달 필요가 없다** |
+
+표시: `~/msa/scripts/mark-agent.sh <repo> <issue> antigravity|claude|codex|clear` 또는 GitHub UI 에서 라벨 클릭.
+
+### 다음 작업 고르기
+
+```bash
+~/msa/scripts/next-task.sh            # 우선순위대로 후보 나열 (+ 클레임 명령까지 출력)
+~/msa/scripts/next-task.sh --claim    # 1순위를 바로 클레임
+```
+
+우선순위: **① 내 도구 라벨 → ② 라벨 없음 → ③ 다른 도구 라벨**.
+
+- **③은 ①·②가 모두 비었을 때만 나온다(즉시 폴백).** 사용자 결정 사항이다: 안티그래비티 태그가 붙어 있어도
+  남은 게 그것뿐이면 다른 도구가 진행한다. **라벨은 우선권이지 소유권이 아니다** — 태그 때문에 도구가 노는 일은 없게 한다.
+- 폴백으로 진행해도 흔적은 남는다. `claim.sh` 가 `tool=` 을 기록하므로 "이 작업을 누가 왜 가져갔는지"가 이슈에 그대로 보인다.
+- 동시 착수를 막는 건 라벨이 아니라 **클레임 프로토콜**(§4-1)이다. 라벨만 보고 착수하지 말 것.
+- 조회는 전부 REST(`gh issue list`)다. `gh project` 는 GraphQL 이라 세션이 10~15개 뜨는 이 환경에서 먼저 마른다 —
+  라우팅에 Project 커스텀 필드를 쓰지 않고 라벨을 쓰는 이유다.
 
 ## 5-1. 자동 점검 장치 — 도구 무관 (2026-08-21 배선, 같은 날 도구 무관화)
 
