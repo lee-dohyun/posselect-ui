@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# git pre-push 훅 — 도구와 무관하게 걸린다(Codex/Antigravity/사람/스크립트 전부).
+#
+# 활성화는 클론마다 1회: `~/msa/scripts/bootstrap-hooks.sh` (git config core.hooksPath .githooks)
+# 검증 본문은 scripts/verify.sh 에 있다 — Claude 훅·CI 와 같은 스크립트를 부른다.
+set -uo pipefail
+ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || exit 0
+[ -f "$ROOT/scripts/verify.sh" ] || exit 0
+bash "$ROOT/scripts/verify.sh" || {
+  echo "pre-push: 검증 실패로 push 를 중단했다." >&2
+  exit 1
+}
+exit 0
