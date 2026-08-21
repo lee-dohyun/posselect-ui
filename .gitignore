@@ -1,2 +1,5 @@
 node_modules/
 storybook-static/
+
+# Claude Code session worktrees (never track, see repo history for why)
+.claude/worktrees/
