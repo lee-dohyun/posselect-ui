@@ -1,0 +1,50 @@
+# PR 단계 품질 게이트 (Next.js 프론트 / 공유 패키지)
+#
+# 왜 필요한가: 이 저장소들의 CI는 Docker 빌드 성공만을 게이트로 삼는다(공유 패키지는 typecheck 까지).
+# main push 는 self-hosted runner 를 통해 즉시 프로덕션에 반영되므로, 타입 오류나 린트 위반이
+# 아무 데서도 걸러지지 않은 채 운영에 나갈 수 있다.
+#
+# 각 단계는 해당 npm 스크립트가 있을 때만 돈다 — 저장소마다 갖춘 스크립트가 다르기 때문이다
+# (예: posselect-ui/posselect-shell 에는 lint 스크립트가 없다).
+name: PR Check
+
+on:
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: pr-check-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      # @posselect/ui 는 git 의존성이라 lockfile 이 없거나 어긋나면 npm ci 가 실패한다 — 둘 다 대응.
+      - name: Install
+        run: npm ci || npm install
+      - name: Detect available scripts
+        id: scripts
+        run: |
+          has() { node -e "process.exit(require('./package.json').scripts?.['$1'] ? 0 : 1)"; }
+          for s in typecheck lint test; do
+            if has "$s"; then echo "$s=true" >> "$GITHUB_OUTPUT"; else echo "$s=false" >> "$GITHUB_OUTPUT"; fi
+          done
+      - name: Typecheck
+        if: steps.scripts.outputs.typecheck == 'true'
+        run: npm run typecheck
+      - name: Lint
+        if: steps.scripts.outputs.lint == 'true'
+        run: npm run lint
+      - name: Test
+        if: steps.scripts.outputs.test == 'true'
+        run: npm test
+      - name: Report missing gates
+        run: |
+          [ "${{ steps.scripts.outputs.typecheck }}" = "true" ] || echo "::warning::typecheck 스크립트가 없어 타입 검사를 건너뛰었습니다."
+          [ "${{ steps.scripts.outputs.test }}" = "true" ]      || echo "::warning::test 스크립트가 없어 테스트를 건너뛰었습니다."
