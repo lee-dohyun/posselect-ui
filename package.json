@@ -44,7 +44,7 @@
     "typescript": "^5",
     "vite": "^7",
     "vitest": "^4.1.10",
-    "wait-on": "^7.2.0"
+    "wait-on": "^9.1.0"
   },
   "comments": {
     "storybook-pinning": "storybook/@storybook/* 세 패키지는 캐럿(^)이 아니라 정확한 버전으로 고정한다. 서로 peer로 같은 버전을 요구하는데 npm 배포 시점이 어긋나면(실제로 프레임워크 패키지만 10.5.8이 먼저 올라온 상태를 만남) ^10이 서로 다른 패치를 집어 ERESOLVE로 설치가 깨진다. 올릴 때는 세 개를 같이 올릴 것."
