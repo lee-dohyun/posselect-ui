@@ -115,7 +115,7 @@ docker build -t posselect-ui . && docker run -p 8080:80 posselect-ui
 
 ---
 
-<!-- canon:begin sha=b132df75dde2 src=~/msa/AGENTS.md -->
+<!-- canon:begin sha=1801481541e1 src=~/msa/AGENTS.md -->
 ## 공통 캐논 (모든 AI 도구 공통)
 
 > **공통 캐논 (자동 주입 — 손으로 고치지 말 것).** 원본은 `~/msa/AGENTS.md`이고 이 블록은
@@ -279,6 +279,9 @@ Claude Code 는 SessionStart 훅이 자동 실행한다(로컬 모드). **훅이
 | 사고 기록·ADR 등 장기 지식 | GitHub Wiki(gateway/order.api) |
 | 도구 자신의 작업 효율용 메모 | 각 도구의 메모리 — **다른 도구는 못 읽는다는 전제로만 사용** |
 
+**GitHub Wiki를 근거로 답할 때**: 출처(문서명/섹션)를 인용하고, Wiki에 근거가 없으면 지어내지 말고
+"근거 없음"이라고 답한다(gateway#227 검토 — 서드파티 지식관리 플러그인 대신 이 프롬프트 규칙으로
+대체). Wiki 자체의 정합성(깨진 링크·stale 문서)은 `~/msa/scripts/wiki-lint.sh`로 점검한다.
 
 ## 4-2. 작업 라우팅 — 어느 도구가 무엇을 하나
 
