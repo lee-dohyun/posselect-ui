@@ -115,7 +115,7 @@ docker build -t posselect-ui . && docker run -p 8080:80 posselect-ui
 
 ---
 
-<!-- canon:begin sha=7ab837cdce2d src=~/msa/AGENTS.md -->
+<!-- canon:begin sha=b132df75dde2 src=~/msa/AGENTS.md -->
 ## 공통 캐논 (모든 AI 도구 공통)
 
 > **공통 캐논 (자동 주입 — 손으로 고치지 말 것).** 원본은 `~/msa/AGENTS.md`이고 이 블록은
@@ -206,6 +206,8 @@ docker build -t posselect-ui . && docker run -p 8080:80 posselect-ui
 ~/msa/scripts/session-start.sh      # 활성/스테일 클레임 + 저장소별 브랜치·미커밋·미푸시 상태
 ```
 
+이 스크립트는 브리핑 전에 `sweep-claims.sh` 를 한 번 돌려 **죽은 세션이 잡아 둔 클레임을 먼저 회수**한다. 그래서 "🔒 잡혀 있음"이 실제로 살아 있는 세션만 가리킨다.
+
 Claude Code 는 SessionStart 훅이 자동 실행한다(로컬 모드). **훅이 없는 도구는 세션의 첫 명령으로 직접 실행할 것.**
 
 - Project #2 조회 결과는 세션 간 공유 캐시(기본 5분, `~/.cache/msa-agent/`)를 쓴다. `gh project` 계열은 전부
@@ -223,15 +225,46 @@ Claude Code 는 SessionStart 훅이 자동 실행한다(로컬 모드). **훅이
 | `PROGRESS` | 의미 있는 단위마다 | `~/msa/scripts/progress.sh <repo> <issue> "한 일\|다음 단계\|검증 방법"` |
 | `HANDOFF` | 중단하거나 끝낼 때 | `~/msa/scripts/handoff.sh <repo> <issue> "남은 일/위험" [--done]` |
 | `TAKEOVER` | 남의 스테일 클레임을 인수할 때 | `~/msa/scripts/claim.sh <repo> <issue> --takeover` |
+| `HANDOFF (auto)` | 세션이 죽어서 아무도 못 남길 때 | `~/msa/scripts/sweep-claims.sh` 가 자동 (크론 10분 + 세션 시작) |
 
 - 코멘트 첫 줄은 ```CLAIM tool=... branch=... started=...``` 형태로 고정된다. 손으로 쓰지 말고 스크립트를 쓸 것 — 포맷이 깨지면 다른 세션의 클레임 판정이 틀린다.
 - **실행 도구 식별은 자동이다 — 세션마다 뭘 설정할 필요 없다.** 스크립트가 `/proc` 조상 체인에서 이 셸을 띄운 주체(ccd-cli / codex / antigravity IDE 서버 …)를 찾아 판별한다. 환경변수는 자식으로 새기 때문에(Claude 세션 안에서 codex 를 띄우면 `CLAUDECODE` 를 물려받는다) 조상 체인을 먼저 본다.
   - 판별 결과가 `unknown` 으로 남는 도구가 생기면, 그때마다 `AGENT_TOOL` 을 치지 말고 **`~/msa/scripts/lib/agent-protocol.sh` 의 `_agent_ancestry_scan()` 에 패턴 한 줄을 추가**한다(한 번만 하면 그 도구의 모든 세션에 적용된다).
   - 일회성으로 다르게 기록해야 할 때만 `AGENT_TOOL=... ` 또는 `--tool` 로 덮어쓴다.
 
-### 스테일 클레임 만료 (2시간)
+### 클레임 상태 판정 (생존 우선, 2시간은 폴백)
 
-마지막 프로토콜 코멘트가 **2시간**(`MSA_CLAIM_STALE_SECONDS`) 넘게 없으면 그 클레임은 만료된 것으로 보고 `--takeover` 로 인수할 수 있다. 반납되지 않은 `In Progress` 가 영원히 남아 다른 세션을 막는 문제를 이 규칙으로 푼다(2026-08-21 실측: In Progress 11건 중 클레임 기록이 있는 것 0건, 일부는 며칠째 정지).
+`session-start.sh` 와 `claim.sh` 가 보여주는 상태는 네 가지다.
+
+| 표시 | 뜻 | 인수 |
+|------|-----|------|
+| 🔒 `active` | 코멘트도 최신이고 세션 프로세스도 살아 있다 | 건드리지 말 것 |
+| 💀 `dead` | **세션 프로세스가 실제로 없다** | 시간 무관 즉시 인수 가능 |
+| 🟡 `stale` | 마지막 코멘트가 **2시간**(`MSA_CLAIM_STALE_SECONDS`) 초과, 로컬 레코드 없음 | 인수 가능 |
+| 🟡 `stale-alive` | 2시간 초과지만 프로세스는 살아 있다 | 인수 전 사용자에게 확인 |
+
+`claim.sh` 는 이슈 코멘트와 별개로 `~/.cache/msa-agent/claims/<repo>__<issue>.rec` 에 그 세션의 **도구 PID·시작시각·boot_id** 를 남긴다. 코멘트가 도구 간 공유 매체라면 이 파일은 "그 세션이 아직 살아 있는가"에 답하는 로컬 신호다 — 모든 도구가 같은 호스트의 프로세스로 뜨기 때문에 가능하다(PID 재사용은 시작시각으로, 재부팅은 boot_id 로 걸러낸다).
+
+**2시간 규칙은 없애지 않았다.** 레코드가 없는 옛 클레임·캐시가 지워진 경우·다른 머신에서 온 클레임은 여전히 이 규칙으로만 회수된다(2026-08-21 실측: In Progress 11건 중 클레임 기록이 있는 것 0건, 일부는 며칠째 정지).
+
+### 세션이 죽었을 때 (비정상 종료)
+
+`handoff.sh` 는 세션이 **스스로 부를 수 있을 때만** 동작한다. SIGKILL·크래시·터미널 강제 종료에서는 아무 기록도 남지 않는다. 그 공백을 `sweep-claims.sh` 가 메운다 — 크론 10분 주기 + 세션 시작 시 + (Claude 한정) SessionEnd 훅에서 돈다.
+
+죽은 클레임을 찾으면 순서대로:
+1. 작업물을 **wip 커밋 + push**(아래 규칙) — 인계 가능 상태로 만든다
+2. 이슈에 `HANDOFF ... auto=true` 코멘트(사유·브랜치·스냅샷 위치 포함)
+3. 로컬 레코드 삭제 → 다른 세션은 즉시 `--takeover` 로 이어받는다
+
+**자동 wip 스냅샷 규칙 — 이 제약들은 안전장치이므로 완화하지 말 것.**
+- `main`/`master` 에서는 **절대 커밋·push 하지 않는다**(main push = 즉시 프로덕션 배포). 미커밋 상태를 코멘트로 보고만 한다.
+- 같은 worktree 에서 **살아 있는 프로세스나 다른 클레임이 작업 중이면 커밋하지 않는다.** 공용 클론(`~/git/<repo>`)에서 `git add -A` 는 다른 세션의 미커밋 작업까지 삼켜 원격에 올려 버린다.
+- push 는 `--no-verify` 로 한다. 중단된 wip 코드는 `verify.sh` 를 통과하지 못하는 게 정상이고, 검증 실패로 스냅샷이 실패하면 보존이라는 목적 자체가 사라진다. wip 브랜치 push 는 워크플로를 하나도 트리거하지 않는다(전 저장소 트리거가 `push: [main]` + `pull_request` 뿐).
+- 직접 push 가 거부되면(non-fast-forward) `wip/auto/<branch>-<issue>` 로 우회 push 하고 코멘트에 그 이름을 적는다 — 남의 브랜치를 덮지 않는다.
+- 커밋 메시지에 **`[skip ci]` 를 넣지 않는다.** 본문에서도 인식되므로 그 브랜치가 나중에 머지될 때 배포가 조용히 건너뛰어진다.
+- 커밋 전 `git diff HEAD` 패치 사본을 `~/.cache/msa-agent/wip/` 에 남긴다(worktree 가 나중에 지워져도 복구 가능하게).
+
+**사후 회수는 보험이지 대체재가 아니다.** 위 제약 때문에 스냅샷이 포기되는 경우가 있으므로, 살아 있는 동안 스스로 push 하는 규칙(§ 인계 가능 = 원격에 push된 상태)이 여전히 1차 수단이다.
 
 ### 인계 가능 = 원격에 push된 상태
 
