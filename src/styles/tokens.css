@@ -364,7 +364,12 @@ textarea.input { min-height: 90px; resize: vertical; }
 
 /* — empty state — */
 .empty-state { padding: 56px 24px; text-align: center; }
-.empty-state-icon { color: var(--color-accent-400); margin: 0 auto 16px; display: block; }
+/* 아이콘 슬롯은 아이콘 자체가 아니라 그것을 감싼 래퍼 div 다(EmptyState.tsx). 래퍼는 이미
+   full width 라 margin:0 auto 로는 안쪽 아이콘이 가운데로 오지 않고, 상위의 text-align:center
+   도 Tailwind preflight(`svg { display: block }`)를 함께 로드하는 소비자에서는 SVG 가 블록이
+   되어 안 먹는다 — 래퍼를 중앙 정렬 컨테이너로 두어 자식이 인라인이든 블록이든 가운데로
+   오게 한다(posselect-ui#35). */
+.empty-state-icon { color: var(--color-accent-400); display: flex; justify-content: center; margin-bottom: 16px; }
 .empty-state-title { font-family: var(--font-heading); font-weight: var(--font-heading-weight); font-size: 20px; }
 .empty-state-desc { font-size: 14px; opacity: 0.7; margin: 8px 0 20px; }
 
