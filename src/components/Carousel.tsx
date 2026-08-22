@@ -18,6 +18,7 @@ interface CarouselProps {
 
 export function Carousel({ items, autoPlayInterval = 3000, className = '' }: CarouselProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
   const timerRef = useRef<number | null>(null);
 
   const startTimer = () => {
@@ -59,12 +60,32 @@ export function Carousel({ items, autoPlayInterval = 3000, className = '' }: Car
     <div 
       className={`carousel-container blueprint ${className}`}
       style={{ position: 'relative', overflow: 'hidden', borderRadius: '4px', height: '100%' }}
-      onMouseEnter={stopTimer}
-      onMouseLeave={startTimer}
+      onMouseEnter={() => {
+        setIsHovered(true);
+        stopTimer();
+      }}
+      onMouseLeave={() => {
+        setIsHovered(false);
+        startTimer();
+      }}
+      onKeyDown={(e) => {
+        if (e.key === 'ArrowLeft') {
+          e.preventDefault();
+          goToPrev();
+        } else if (e.key === 'ArrowRight') {
+          e.preventDefault();
+          goToNext();
+        }
+      }}
+      role="region"
+      aria-roledescription="carousel"
+      aria-label="배너 캐러셀"
+      tabIndex={0}
     >
       <BlueprintCorners />
       <div 
         className="carousel-track"
+        aria-live={isHovered ? 'polite' : 'off'}
         style={{ 
           display: 'flex', 
           transition: 'transform 0.5s ease-in-out',
