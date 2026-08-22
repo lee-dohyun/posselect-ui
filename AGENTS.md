@@ -115,7 +115,7 @@ docker build -t posselect-ui . && docker run -p 8080:80 posselect-ui
 
 ---
 
-<!-- canon:begin sha=1801481541e1 src=~/msa/AGENTS.md -->
+<!-- canon:begin sha=d8c1c14d807c src=~/msa/AGENTS.md -->
 ## 공통 캐논 (모든 AI 도구 공통)
 
 > **공통 캐논 (자동 주입 — 손으로 고치지 말 것).** 원본은 `~/msa/AGENTS.md`이고 이 블록은
@@ -174,6 +174,18 @@ docker build -t posselect-ui . && docker run -p 8080:80 posselect-ui
 - **`pull_request` 워크플로는 PR head 브랜치의 파일로 돈다.** main의 워크플로를 고쳐도 이미 열려 있는 PR에는 반영되지 않고, `gh run rerun`은 원래 런의 워크플로 버전을 재사용한다. 수정 확인은 **브랜치를 리베이스한 뒤** 새 런으로 할 것.
 - **Dependabot PR에는 저장소 시크릿이 전달되지 않는다.** 시크릿을 쓰는 스텝(`docker/login-action`)은 `if: github.event_name == 'push'`로 막고, `secrets.X`를 문자열에 끼워 넣는 곳(이미지 태그)은 `${{ secrets.X || 'ci-local' }}` 폴백을 줄 것 — 안 그러면 모든 Dependabot PR이 상시 실패해 PR 게이트 신호가 죽는다(gateway#209).
 
+### 범위 / 근거 / 용어 (AI 자가검토 — verify.sh 와 훅이 못 잡는 것)
+- **요청된 범위만 구현한다(YAGNI).** 요청에 없는 기능·집계·가공·리팩터링·"겸사겸사" 수정을 임의로 추가하지 않는다. 범위 밖에서 발견한 문제는 고치지 말고 이슈(또는 진행 코멘트)로 남긴다 — 다른 세션이 같은 파일을 잡고 있을 수 있다.
+- **데이터가 없으면 추측으로 채우지 않는다.** 스키마·API 응답·인덱스에 없는 값(예: 계획 마감일, 평균치, 변경 이력)은 지어내거나 유사 필드로 대용하지 말고 `null`/빈 값으로 두고, 코드 주석과 이슈에 "데이터 부재로 미구현"을 명시한다. §4-1 "Wiki 근거기반 질의" 규칙의 코드판이다.
+- **같은 개념에는 같은 이름을 쓴다.** enum 값·API 필드·DB 컬럼·i18n 키·UI 라벨의 도메인 용어는 gateway Wiki **[Glossary](https://github.com/lee-dohyun/gateway/wiki/Glossary)** 가 기준이다. 새 개념·상태값을 만들면 **코드보다 먼저** Glossary 에 한 줄 등록하고, 서비스마다 다른 이름(한쪽 `SELLER`·다른 쪽 `PARTNER` 식)을 만들지 않는다. 용어 사전은 저장소에 복제하지 않는다(한 곳에만 — 복제하면 드리프트).
+- 근거: gateway#239 — 외부 하네스 문서 검토에서 채택. 위 세 가지는 스크립트로 강제되지 않아 문서 규칙으로만 막을 수 있는 것들이다.
+
+### 플레이북 (화면·도메인 단위 작업 규칙)
+- **같은 화면/도메인에서 재작업·사고가 2회 이상 반복되면** `<저장소>/docs/playbooks/<이름>.md` 를 쓴다. 전 화면을 미리 만들지 않는다 — **빈 문서·플레이스홀더 금지**(운영되지 않은 하네스는 끝내 채워지지 않는다, gateway#239 검토 사례).
+- 왜: 화면 하나가 프론트 + `@posselect/ui`/`posselect-shell` + 백엔드 2~3개에 걸치고, 그 맥락 없이 착수한 세션이 같은 원인을 다시 밟는다(메인페이지 3중 원인, 상품 이미지 4중 버그, hero 배너 CSS 변수 사례).
+- 절 구성(템플릿 `~/msa/scripts/templates/playbook.md`): ① 소스 — 걸치는 저장소·컴포넌트·공유 패키지 ② 데이터 — 호출 엔드포인트, gateway `PUBLIC_EXACT_PATHS` 등록 여부, 캐시 ③ 상태·표시 — enum 값 ↔ 라벨 ↔ 디자인 토큰(미정의 CSS 변수 금지) ④ **⚠️ 데이터 부재로 미구현/한정된 범위** ⑤ 작업 원칙·함정 ⑥ 이력.
+- 플레이북이 있는 화면은 **착수 전에 읽고, 변경 후 플레이북도 같이 갱신**한다. 저장소 `AGENTS.md` 의 저장소 고유 절에 목록을 링크한다.
+
 ### CLI / 스크립팅
 - **SSH를 통한 원격 bash 명령 실행 시 따옴표 이스케이프 주의:** PowerShell에서 변수(`$BODY`)를 따옴표 안에 넣어 원격 `curl` 등을 호출하면 bash 쪽에서 JSON 포맷 에러(`400 Bad Request` 등)가 발생하기 쉽다. 복잡한 인용부호(JSON 등)가 포함된 스크립트는 **전체를 Base64로 인코딩한 뒤 원격에서 디코딩하여 `bash`로 실행**한다 (`echo $b64 | base64 -d | bash`).
 
@@ -195,6 +207,22 @@ docker build -t posselect-ui . && docker run -p 8080:80 posselect-ui
 - Claude Code는 `EnterWorktree` 도구로 `.claude/worktrees/<repo>/<name>` 아래 자동 생성/전환한다 — 기본 경로를 그대로 쓴다.
 - Codex/Antigravity 등 자체 worktree 기능이 없는 도구는 `git worktree add ../<repo>-<slug> -b <branch>`로 수동 생성하고, 작업 종료 후 `git worktree remove`로 정리한다.
 - **각 저장소 `.gitignore`에 `.claude/worktrees/`가 반드시 있어야 한다.** 없으면 `git add -A`/`git add .` 한 번에 worktree 디렉터리 전체가 gitlink(모드 160000)로 커밋되어 origin까지 올라갈 수 있다 — 2026-08-21 `customer.front`에서 실제로 발생·이미 push된 상태로 확인됨(별도 정리 필요, 이 문서 편집만으로는 해결되지 않음).
+
+### 이슈를 어느 저장소에 만드나 (2026-08-22 신설)
+
+**판정 기준은 "이 일이 끝나면 어느 저장소에 커밋이 생기나" 하나다.**
+
+| 끝났을 때 생기는 것 | 저장소 |
+|---|---|
+| 특정 저장소에 커밋이 생긴다 | 그 저장소 (`auth.api`, `store.front`, `posselect-ui` …) |
+| `~/msa` 매니페스트·운영 변경이거나, 여러 저장소에 걸친 **실작업** | **`gateway`** (catch-all — `~/msa` 는 git 저장소가 아니라 이슈를 걸 곳이 없다) |
+| **커밋이 안 생긴다** — 기술/설계 도입 검토, 결정 문서, 장기 보류 | **`architecture`** + `long-term` 라벨 |
+
+- 세 번째 줄이 신설된 이유: 같은 성격의 항목(`[장기 개선] Kafka / ArgoCD / Vault / Playwright 도입` 등)이 `architecture#2~15` 14건과 `gateway#226·227` 로 **두 곳에 갈라져 등록되고 있었다.** 도입 검토는 `architecture` 한 곳으로 모은다. 새 저장소를 만들어 세 번째 집을 늘리지 말 것.
+- `architecture` 의 기존 라벨을 그대로 쓴다: `long-term` + `infrastructure` / `observability` / `testing` / `backend` / `frontend` / `security` / `ai-engineering`.
+- 검토 결과 **실제로 도입하기로 결정되면 그때 구현 이슈를 해당 저장소(또는 `gateway`)에 새로 만들고** 원래 검토 이슈는 닫는다. 검토 이슈를 구현 이슈로 개조하지 말 것 — 하나의 작업 단위 = 하나의 이슈.
+- 산출물이 조사·설계 문서뿐이면 **브랜치를 따지 않는다.** `~/msa/research/` 에 `.md` + 렌더링본 `.html` 로 쓰고 이슈에 링크한다(§2 "무거운 인프라는 도입하지 말고 기록만 한다"와 같은 취지). 실제 코드가 생기는 시점부터 이슈 1건 = 브랜치 1개 = worktree 1개.
+- **크로스레포 부모 에픽은 어느 저장소에 두든 `Closes #N` 으로 자동 종료되지 않는다** — GitHub 은 저장소 간 종료 키워드를 지원하지 않는다. 하위 작업이 끝나면 부모는 손으로 닫는다. (이건 저장소를 옮겨도 해결되지 않으므로, 이슈 이전의 근거가 될 수 없다.)
 
 ## 4-1. 인계 프로토콜 — 다른 도구가 중간부터 이어받게 하기
 
@@ -277,6 +305,7 @@ Claude Code 는 SessionStart 훅이 자동 실행한다(로컬 모드). **훅이
 | 진행 중 상태·다음 단계·인계 정보 | **이슈 코멘트**(위 프로토콜) |
 | 확정된 개발 규칙 | `~/msa/AGENTS.md` (이 문서) |
 | 사고 기록·ADR 등 장기 지식 | GitHub Wiki(gateway/order.api) |
+| 도메인 용어 사전(enum·필드·라벨의 기준) | GitHub Wiki gateway [Glossary](https://github.com/lee-dohyun/gateway/wiki/Glossary) — 저장소에 복제하지 않는다 |
 | 도구 자신의 작업 효율용 메모 | 각 도구의 메모리 — **다른 도구는 못 읽는다는 전제로만 사용** |
 
 **GitHub Wiki를 근거로 답할 때**: 출처(문서명/섹션)를 인용하고, Wiki에 근거가 없으면 지어내지 말고
