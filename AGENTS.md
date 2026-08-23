@@ -122,7 +122,7 @@ docker build -t posselect-ui . && docker run -p 8080:80 posselect-ui
 
 ---
 
-<!-- canon:begin sha=d8c1c14d807c src=~/msa/AGENTS.md -->
+<!-- canon:begin sha=ec357b59ef79 src=~/msa/AGENTS.md -->
 ## 공통 캐논 (모든 AI 도구 공통)
 
 > **공통 캐논 (자동 주입 — 손으로 고치지 말 것).** 원본은 `~/msa/AGENTS.md`이고 이 블록은
@@ -146,6 +146,7 @@ docker build -t posselect-ui . && docker run -p 8080:80 posselect-ui
 - 스키마 변경은 **expand-contract**: 컬럼/테이블 제거는 "새것 추가 → 코드 전환 → 다음 릴리스에서 제거" 2단계로.
 - `@Enumerated(STRING)` enum에 값 추가 시 기존 CHECK 제약은 자동으로 안 넓혀짐 — 마이그레이션에 `ALTER` 포함할 것.
 - 재고 음수 방지 CHECK, 멱등성 유니크 인덱스 등 **DB 레벨 제약은 애플리케이션 로직과 별개로 유지**한다 (posselect #211 V3).
+- **마이그레이션 버전 번호는 `origin/main` 을 다시 확인하고 정한다.** 로컬 `ls` 로 정하면, 작업하는 동안 다른 세션이 같은 번호를 선점할 수 있다. 같은 버전이 둘이면 Flyway 는 부팅 자체를 거부한다(파드가 안 뜬다). push 직전에 `git fetch && git ls-tree origin/main <migration-dir>` 로 재확인할 것 (auth.api#29, 2026-08-22).
 
 ### 트랜잭션 / 정합성
 - **`@Transactional` 안에서 원격 HTTP 호출 금지**(보상 로직 없이). 로컬 롤백돼도 원격은 롤백 안 된다 (posselect #140, order.api 사례).
