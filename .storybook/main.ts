@@ -19,10 +19,29 @@ const config: StorybookConfig = {
     options: {},
   },
   staticDirs: [{ from: '../site', to: '/mockup' }],
+  /**
+   * posselect-shell(런타임 마이크로프론트엔드 Header/Footer)의 Storybook을 Composition으로
+   * 끌어와 이 사이트 하나에서 다 보이게 한다 — 저장소 경계를 유지하면서 문서는 합치는 방식
+   * (posselect-shell#13에서 채택한 옵션 A).
+   *
+   * url이 `https://shell.posselect.com/storybook` 이었을 때는 **동작하지 않았다.** Composition은
+   * 매니저가 브라우저에서 ref의 index.json을 fetch하는데, 다른 호스트라 크로스 오리진이고
+   * shell 쪽 nginx가 Access-Control-Allow-Origin을 안 보내서 차단됐다(2026-08-23 실측:
+   * `TypeError: Failed to fetch`). 사이드바에 노드는 뜨는데 "No stories found"만 나왔다.
+   *
+   * 그래서 게이트웨이가 `storybook.posselect.com/shell/**` 를 shell 서비스의 `/storybook/**` 로
+   * 라우팅하도록 하고(gateway#240), 여기서는 **같은 오리진 경로**를 가리킨다. CORS가 관여하지
+   * 않으므로 헤더 관리 지점이 늘지 않는다.
+   *
+   * ⚠️ 이 URL은 게이트웨이 라우트와 한 쌍이다. 한쪽만 바꾸면 조용히 "No stories found"로 되돌아간다.
+   */
   refs: {
     'posselect-shell': {
       title: 'Shell (Header/Footer)',
-      url: process.env.NODE_ENV === 'development' ? 'http://localhost:6007' : 'https://shell.posselect.com/storybook',
+      url:
+        process.env.NODE_ENV === 'development'
+          ? 'http://localhost:6007'
+          : 'https://storybook.posselect.com/shell',
     },
   },
 };
