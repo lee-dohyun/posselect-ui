@@ -63,6 +63,13 @@ eslint/prettier 설정은 여전히 없다.
 docker build -t posselect-ui . && docker run -p 8080:80 posselect-ui
 ```
 
+## TDD / Superpowers 플러그인
+
+이 저장소는 `.claude/settings.json`에 `superpowers` 플러그인이 활성화되어 있습니다.
+- 새로운 컴포넌트 추가나 로직 변경 시 **TDD(Test-Driven Development)**를 원칙으로 합니다.
+- 실제 구현 코드를 작성하기 전에 반드시 `src/components/*.test.tsx` (Vitest/testing-library 기반 유닛 테스트) 또는 `src/stories/*.stories.tsx` (Storybook 시각적 테스트)를 먼저 작성하고 검증해야 합니다.
+- 작업을 시작할 때 `brainstorming` 또는 `writing-plans` 스킬을 사용하여 체계적으로 설계하고, 완료 전 `verification-before-completion`을 통해 빌드/테스트를 확인하세요.
+
 ## 아키텍처
 
 - **`src/index.ts`**: 모든 공개 컴포넌트/타입의 배럴 export. 새 컴포넌트를 추가하면 반드시 여기에도
