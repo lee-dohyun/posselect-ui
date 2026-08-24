@@ -26,6 +26,8 @@ export { SegmentedControl } from './components/SegmentedControl';
 export type { SegmentedControlProps } from './components/SegmentedControl';
 export { ProductGrid } from './components/ProductGrid';
 export type { ProductGridProps } from './components/ProductGrid';
+export { ProductCard } from './components/ProductCard';
+export type { ProductCardProps } from './components/ProductCard';
 
 
 // CSS is not re-exported from here — consuming apps import it once at the root, e.g.:
