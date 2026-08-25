@@ -287,6 +287,38 @@ export const AllAssets: Story = {
         <AssetCard file="favicons/favicon-transparent-32.png" label="블루 P (구 시안, 32)" note="32×32 · 배경 투명" background="checker" />
       </Section>
 
+      <Section
+        title="배지 파비콘"
+        desc="독자 파비콘을 쓰는 posselect 계열 내부 도구(그라파나·키클락·tool.posselect·이 문서 사이트 자신)의 브라우저 탭에서 'PosSelect 계열'임이 드러나도록, 코랄 P 파비콘 우하단에 그 도구의 실제 아이콘을 P 잉크 높이의 절반 크기로 겹친 합성 파비콘이다(2026-08-25). 위 정식 파비콘과 달리 두 마크가 겹치는 게 의도된 디자인이다 — 겹침이 없으면 배지가 아니라 그냥 나란히 놓인 두 아이콘이 된다."
+      >
+        <AssetCard
+          file="favicons/badges/storybook-256.png"
+          label="Storybook (이 사이트)"
+          note="256×256 · storybook.posselect.com이 실제로 쓰는 값 (.storybook/manager-head.html)"
+          background="checker"
+        />
+        <AssetCard
+          file="favicons/badges/tool-256.png"
+          label="tool.posselect.com"
+          note="256×256 · tool.front가 실제로 쓰는 값"
+          background="checker"
+        />
+        <AssetCard
+          file="favicons/badges/grafana-256.png"
+          label="Grafana"
+          note="256×256 · monitoring.posselect.com은 Grafana 자체 index.html이 상대경로(public/build/img/fav32.png)를 하드코딩해 이 CDN 파일을 직접 참조하지 못한다. 실제 서빙은 K8s ConfigMap 마운트(~/msa/monitoring/grafana-favicon-posselect-cm.yaml)이고, 이 파일은 소스 보관용 사본."
+          warn="이 CDN 경로가 아니라 ConfigMap이 서빙 소스다 — 바꾸려면 ConfigMap을 갱신하고 파드를 재시작해야 한다."
+          background="checker"
+        />
+        <AssetCard
+          file="favicons/badges/keycloak-256.png"
+          label="Keycloak"
+          note="256×256 · keycloak.posselect.com welcome 페이지 전용(로그인/계정/관리콘솔 테마는 미적용). 마크 출처는 keycloak/keycloak-misc 공식 벡터(logo/icon.svg)."
+          warn="이 CDN 경로가 아니라 K8s ConfigMap(keycloak-favicon-posselect, parent=keycloak 커스텀 테마)이 서빙 소스다 — 바꾸려면 ConfigMap을 갱신하고 파드를 재시작해야 한다."
+          background="checker"
+        />
+      </Section>
+
       <Section title="기타">
         <AssetCard file="misc/_v_check.png" label="검수용 참고 이미지" height={90} />
       </Section>
