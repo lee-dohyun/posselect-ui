@@ -122,7 +122,7 @@ docker build -t posselect-ui . && docker run -p 8080:80 posselect-ui
 
 ---
 
-<!-- canon:begin sha=e6e86cbd7515 src=~/msa/AGENTS.md -->
+<!-- canon:begin sha=80bf0bb288e4 src=~/msa/AGENTS.md -->
 ## 공통 캐논 (모든 AI 도구 공통)
 
 > **공통 캐논 (자동 주입 — 손으로 고치지 말 것).** 원본은 `~/msa/AGENTS.md`이고 이 블록은
@@ -187,7 +187,8 @@ docker build -t posselect-ui . && docker run -p 8080:80 posselect-ui
 - **요청된 범위만 구현한다(YAGNI).** 요청에 없는 기능·집계·가공·리팩터링·"겸사겸사" 수정을 임의로 추가하지 않는다. 범위 밖에서 발견한 문제는 고치지 말고 이슈(또는 진행 코멘트)로 남긴다 — 다른 세션이 같은 파일을 잡고 있을 수 있다.
 - **데이터가 없으면 추측으로 채우지 않는다.** 스키마·API 응답·인덱스에 없는 값(예: 계획 마감일, 평균치, 변경 이력)은 지어내거나 유사 필드로 대용하지 말고 `null`/빈 값으로 두고, 코드 주석과 이슈에 "데이터 부재로 미구현"을 명시한다. §4-1 "Wiki 근거기반 질의" 규칙의 코드판이다.
 - **같은 개념에는 같은 이름을 쓴다.** enum 값·API 필드·DB 컬럼·i18n 키·UI 라벨의 도메인 용어는 gateway Wiki **[Glossary](https://github.com/lee-dohyun/gateway/wiki/Glossary)** 가 기준이다. 새 개념·상태값을 만들면 **코드보다 먼저** Glossary 에 한 줄 등록하고, 서비스마다 다른 이름(한쪽 `SELLER`·다른 쪽 `PARTNER` 식)을 만들지 않는다. 용어 사전은 저장소에 복제하지 않는다(한 곳에만 — 복제하면 드리프트).
-- 근거: gateway#239 — 외부 하네스 문서 검토에서 채택. 위 세 가지는 스크립트로 강제되지 않아 문서 규칙으로만 막을 수 있는 것들이다.
+- **저장소의 현재 상태는 `git show origin/main:<파일>` 로 확인한다.** 이 머신은 공용 클론(`~/git/<repo>`)이 다른 세션의 feature 브랜치에 체크아웃돼 있는 게 정상이라 **로컬 워킹트리의 파일은 `main` 의 내용이 아니다.** "그 파일에 이 내용이 없다"를 로컬 grep 으로 판단하면 이미 있는 것을 다시 만들거나 존재하지 않는 문제를 고치는 작업을 통째로 만들어낸다 — 2026-08-25 실제 오진(37커밋 뒤쳐진 브랜치의 3줄 스텁을 main 으로 착각해 "프론트 4곳에 문서가 없다"고 보고, 실제 공백은 1곳이었다). 마이그레이션 버전 규칙(§DB/스키마)이 같은 이유로 이미 `origin/main` 재확인을 요구한다.
+- 근거: gateway#239 — 외부 하네스 문서 검토에서 채택. 위 네 가지는 스크립트로 강제되지 않아 문서 규칙으로만 막을 수 있는 것들이다. 네 번째는 customer.front#37 에서 도출.
 
 ### 플레이북 (화면·도메인 단위 작업 규칙)
 - **같은 화면/도메인에서 재작업·사고가 2회 이상 반복되면** `<저장소>/docs/playbooks/<이름>.md` 를 쓴다. 전 화면을 미리 만들지 않는다 — **빈 문서·플레이스홀더 금지**(운영되지 않은 하네스는 끝내 채워지지 않는다, gateway#239 검토 사례).
@@ -368,7 +369,10 @@ Claude Code 는 SessionStart 훅이 자동 실행한다(로컬 모드). **훅이
 - **`<저장소>/.claude/agents/*.md`** — 저장소별 가드(게이트웨이 화이트리스트, Flyway, 트랜잭션/멱등성,
   캐시 무효화, 디자인 토큰, 셸 계약). Claude Code는 자동 위임하고, **다른 도구는 해당 파일을 읽어 같은 점검을 수행할 것.**
 - **결정적 검사 스크립트** — `check-token-mirror.sh`(posselect-ui), `check-i18n-keys.sh`/`check-mermaid.sh`
-  (architecture), `~/msa/scripts/check-architecture-drift.sh`. LLM 없이 동작하므로 어떤 도구에서든 그냥 실행하면 된다.
+  (architecture), `~/msa/scripts/check-architecture-drift.sh`, `~/msa/scripts/check-manifest-drift.sh`
+  (`~/msa/<디렉터리>/*.yaml` vs 라이브, 기본 `customer/`, gateway#230). LLM 없이 동작하므로 어떤 도구에서든
+  그냥 실행하면 된다. 두 드리프트 스크립트 모두 매주 월요일 09:00대 cron 으로 자동 실행되고
+  `~/msa/scripts/*.log` 에 쌓인다.
 - **CI** — 각 저장소 `pr-check.yml`(PR 단계 게이트), `claude-review.yml`(자동 리뷰, `ANTHROPIC_API_KEY` 필요).
   단 `pr-check.yml` 은 `pull_request` 에서만 돈다 — **main 직push 는 CI 게이트가 없고 곧 배포다.**
   그래서 push 전 검증은 `.githooks/pre-push` 가 유일한 방어선이다.
