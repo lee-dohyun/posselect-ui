@@ -273,7 +273,7 @@ export const AllAssets: Story = {
       </Section>
 
       <Section
-        title="공유(OG) 이미지 — 후보 3안 (결정 대기)"
+        title="공유(OG) 이미지 — B안 채택 (2026-08-26)"
         desc={
           <>
             카카오톡 등 SNS로 링크를 공유할 때 노출되는 og:image·twitter:image 전용 자산.
@@ -282,25 +282,26 @@ export const AllAssets: Story = {
             <code>Logo</code> 컴포넌트가 쓰는 초와이드 워드마크(1410×300)를 그대로 og:image로
             재사용하던 것이 원인 — 선언된 1200×630과 비율이 안 맞아 SNS가 정사각/와이드로 크롭하면
             로고 글자가 잘렸다. 세 후보 모두 로고를 캔버스 중앙의 정사각 세이프존(630×630, 아래
-            점선) 안에 배치해 어떤 크롭에서도 잘리지 않는다 — 어떤 안을 쓸지는 아직 결정 전이라
-            <code>posselect-og-share.png</code>는 잠정적으로 워드마크만(A안)을 가리킨다.
+            점선) 안에 배치해 어떤 크롭에서도 잘리지 않는다 — <b>B안(영문 태그라인)</b>으로 최종
+            결정돼 <code>posselect-og-share.png</code>가 지금 B안 내용을 가리킨다. A·C안은
+            비교 기록용으로 남겨둔다.
           </>
         }
       >
         <OgShareCard
           file="logos/posselect-og-share-wordmark.png"
           label="A. 워드마크만"
-          note="현재 posselect-og-share.png(4개 프론트 og:image)가 가리키는 잠정 기본값"
+          note="채택 안 됨"
         />
         <OgShareCard
           file="logos/posselect-og-share-subtitle-en.png"
-          label="B. 워드마크 + 영문 태그라인"
-          note="Positively Selected for You"
+          label="B. 워드마크 + 영문 태그라인 ✓ 채택"
+          note="Positively Selected for You · 현재 posselect-og-share.png(4개 프론트 og:image)가 가리키는 값"
         />
         <OgShareCard
           file="logos/posselect-og-share-tagline-kr.png"
           label="C. 워드마크 + 한글 태그라인"
-          note="당신을 위한 긍정의 선택"
+          note="채택 안 됨 · 당신을 위한 긍정의 선택"
         />
       </Section>
 
