@@ -102,7 +102,48 @@ function AssetCard({
   );
 }
 
-function Section({ title, desc, children }: { title: string; desc?: string; children: ReactNode }) {
+/** 1200x630 og:image 후보 미리보기. 정사각 세이프존(630x630, 캔버스 중앙 52.5%)을 점선으로 겹쳐 보여준다. */
+function OgShareCard({ file, label, note }: { file: string; label: string; note?: string }) {
+  return (
+    <div style={{ width: 320 }}>
+      <div
+        style={{
+          position: 'relative',
+          width: 320,
+          height: 168,
+          border: '1px solid var(--color-divider)',
+          overflow: 'hidden',
+        }}
+      >
+        <img
+          src={`${CDN}${file}`}
+          alt={label}
+          style={{ width: '100%', height: '100%', display: 'block' }}
+        />
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            bottom: 0,
+            left: '23.75%',
+            width: '52.5%',
+            border: '1px dashed rgba(0,0,0,0.35)',
+            pointerEvents: 'none',
+          }}
+        />
+      </div>
+      <div style={{ fontSize: 12, marginTop: 6 }}>{label}</div>
+      {note && (
+        <div className="text-muted" style={{ fontSize: 11, marginTop: 2 }}>
+          {note}
+        </div>
+      )}
+      <code style={{ fontSize: 10, opacity: 0.6, wordBreak: 'break-all' }}>{file}</code>
+    </div>
+  );
+}
+
+function Section({ title, desc, children }: { title: string; desc?: ReactNode; children: ReactNode }) {
   return (
     <section style={{ marginBottom: 32 }}>
       <h5 style={{ marginBottom: 4 }}>{title}</h5>
@@ -228,6 +269,38 @@ export const AllAssets: Story = {
           label="스택형 라이트 (® 없음)"
           background="dark"
           height={80}
+        />
+      </Section>
+
+      <Section
+        title="공유(OG) 이미지 — 후보 3안 (결정 대기)"
+        desc={
+          <>
+            카카오톡 등 SNS로 링크를 공유할 때 노출되는 og:image·twitter:image 전용 자산.
+            store/customer/product/admin.front의 <code>app/layout.tsx</code>가{' '}
+            <code>logos/posselect-og-share.png</code> 하나를 공통으로 참조한다. 헤더·
+            <code>Logo</code> 컴포넌트가 쓰는 초와이드 워드마크(1410×300)를 그대로 og:image로
+            재사용하던 것이 원인 — 선언된 1200×630과 비율이 안 맞아 SNS가 정사각/와이드로 크롭하면
+            로고 글자가 잘렸다. 세 후보 모두 로고를 캔버스 중앙의 정사각 세이프존(630×630, 아래
+            점선) 안에 배치해 어떤 크롭에서도 잘리지 않는다 — 어떤 안을 쓸지는 아직 결정 전이라
+            <code>posselect-og-share.png</code>는 잠정적으로 워드마크만(A안)을 가리킨다.
+          </>
+        }
+      >
+        <OgShareCard
+          file="logos/posselect-og-share-wordmark.png"
+          label="A. 워드마크만"
+          note="현재 posselect-og-share.png(4개 프론트 og:image)가 가리키는 잠정 기본값"
+        />
+        <OgShareCard
+          file="logos/posselect-og-share-subtitle-en.png"
+          label="B. 워드마크 + 영문 태그라인"
+          note="Positively Selected for You"
+        />
+        <OgShareCard
+          file="logos/posselect-og-share-tagline-kr.png"
+          label="C. 워드마크 + 한글 태그라인"
+          note="당신을 위한 긍정의 선택"
         />
       </Section>
 
