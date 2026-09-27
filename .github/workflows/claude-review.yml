@@ -55,4 +55,4 @@ jobs:
             5. CI 는 이 저장소의 Storybook 문서 사이트만 배포한다 — 소비 저장소 5곳 재빌드가 필요한 변경인지 언급할 것.
             
             확실한 결함만 지적할 것.
-          claude_args: --model claude-sonnet-5 --max-turns 15
+          claude_args: --model claude-opus-5-5 --max-turns 15
