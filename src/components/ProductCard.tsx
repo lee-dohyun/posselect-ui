@@ -9,7 +9,7 @@ export interface ProductCardProps {
   // Phase 2 추가 요소
   originalPrice?: number;
   discountRate?: number;
-  shippingBadge?: string; // 예: "로켓배송", "특급배송"
+  shippingBadge?: string; // 예: "최적 배송" (product.api#92)
   isFreeShipping?: boolean;
   rating?: number;
   reviewCount?: number;

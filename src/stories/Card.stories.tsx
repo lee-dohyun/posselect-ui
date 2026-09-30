@@ -56,8 +56,8 @@ export const InProductGrid: Story = {
     <div className="container" style={{ paddingBlock: 24 }}>
       <div className="product-grid">
         {[
-          { kicker: '로켓배송', title: '무선 이어폰 Pro', meta: '₩89,900' },
-          { kicker: '로켓배송', title: '접이식 스탠딩 책상', meta: '₩129,000' },
+          { kicker: '최적 배송', title: '무선 이어폰 Pro', meta: '₩89,900' },
+          { kicker: '최적 배송', title: '접이식 스탠딩 책상', meta: '₩129,000' },
           { kicker: '신선식품', title: '유기농 원두 1kg', meta: '₩18,500' },
           { kicker: '패션', title: '봄 신상 니트', meta: '₩34,900' },
           { kicker: '뷰티', title: '수분 진정 크림', meta: '₩22,000' },
