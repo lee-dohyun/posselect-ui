@@ -122,7 +122,7 @@ docker build -t posselect-ui . && docker run -p 8080:80 posselect-ui
 
 ---
 
-<!-- canon:begin sha=80bf0bb288e4 src=~/msa/AGENTS.md -->
+<!-- canon:begin sha=8b53a9f595d2 src=~/msa/AGENTS.md -->
 ## 공통 캐논 (모든 AI 도구 공통)
 
 > **공통 캐논 (자동 주입 — 손으로 고치지 말 것).** 원본은 `~/msa/AGENTS.md`이고 이 블록은
@@ -159,7 +159,7 @@ docker build -t posselect-ui . && docker run -p 8080:80 posselect-ui
 - Test Pyramid: Unit(JUnit5/Vitest, 가장 많이) → Integration(Testcontainers 실DB, 서비스 경계 검증) → E2E(Playwright, 핵심 플로우만 적게). 계층별 책임과 저장소별 현황은 `architecture` 저장소 `docs/2026-08-21-test-pyramid-strategy.md` 참고.
 - **위 "트랜잭션 / 정합성" 절의 예외가 여기도 그대로 적용된다** — 트랜잭션 전파·멱등성 변경은 단위 테스트로 검증이 성립하지 않으므로 실제 DB 상태 실측으로 검증한다.
 - **커버리지는 리포트만 하고 게이트로 쓰지 않는다(2026-08-21 결정).** 대부분 저장소가 0%에서 시작해 즉시 임계값을 걸면 모든 PR이 막힌다 — CI가 커버리지를 아티팩트로 남기고, 수치가 쌓이면 추후 임계값 도입을 재검토한다.
-- 기존 테스트가 있는 저장소는 `verify.sh`(§5-1)가 이미 push 전 실행을 강제한다 — 새 테스트를 추가하는 순간부터 자동으로 강제 대상이 된다. 별도 CI 배선이 필요 없다.
+- 기존 테스트가 있는 저장소는 `verify.sh`(§5-1)가 이미 push 전 실행을 강제한다 — 새 테스트를 추가하는 순간부터 자동으로 강제 대상이 된다. 단 이 강제는 **로컬 훅(push 하는 쪽)에서만** 걸린다 — CI 는 `verify.sh` 를 부르지 않는다(아래 §5-1).
 - 근거: architecture#14(장기 개선, TDD 도입), posselect-shell#26(Testcontainers 통합 테스트 표준, posselect #211 readOnly 전파 롤백 사례에서 도출).
 
 ### 보안 / 인가
@@ -195,6 +195,12 @@ docker build -t posselect-ui . && docker run -p 8080:80 posselect-ui
 - 왜: 화면 하나가 프론트 + `@posselect/ui`/`posselect-shell` + 백엔드 2~3개에 걸치고, 그 맥락 없이 착수한 세션이 같은 원인을 다시 밟는다(메인페이지 3중 원인, 상품 이미지 4중 버그, hero 배너 CSS 변수 사례).
 - 절 구성(템플릿 `~/msa/scripts/templates/playbook.md`): ① 소스 — 걸치는 저장소·컴포넌트·공유 패키지 ② 데이터 — 호출 엔드포인트, gateway `PUBLIC_EXACT_PATHS` 등록 여부, 캐시 ③ 상태·표시 — enum 값 ↔ 라벨 ↔ 디자인 토큰(미정의 CSS 변수 금지) ④ **⚠️ 데이터 부재로 미구현/한정된 범위** ⑤ 작업 원칙·함정 ⑥ 이력.
 - 플레이북이 있는 화면은 **착수 전에 읽고, 변경 후 플레이북도 같이 갱신**한다. 저장소 `AGENTS.md` 의 저장소 고유 절에 목록을 링크한다.
+
+### 사용자 설명서 (화면을 쓰는 사람용)
+- **사용자에게 보이는 동작이 바뀌면(새 화면, 입력 항목·검증 규칙, 상태 흐름, 화면 메시지) 같은 PR 에서 그 저장소 `docs/user-guide/<업무>.md` 를 만들거나 고친다.** 내부 리팩터링·성능 개선만이면 필요 없다.
+- 양식과 작성 원칙은 `architecture` 저장소 **`docs/USER_GUIDE_STANDARD.md`** 하나가 기준이다(저장소에 복제하지 않는다). 핵심: 파일 하나 = 사용자의 업무 하나, 화면 메시지는 **코드에서 원문 복사**, "최종 확인"에는 실제로 돌려 본 날짜·배포 커밋, 확인 못 한 동작은 `(미확인)`.
+- 왜: 2026-09-29 기준 파트너·직원·고객용 설명서가 0건이었다. 외부 사용자(partner.posselect.com)가 생기면서 설명서 부재가 곧 문의 폭주가 된다. 설명서가 코드와 따로 놀면 틀린 설명서가 되므로 같은 PR 에서 갱신한다(architecture#30).
+- 설명서가 없는 기존 기능은 **그 기능을 고칠 때** 만든다(전체 소급하지 않는다 — 빈 문서·플레이스홀더 금지는 플레이북과 같다).
 
 ### CLI / 스크립팅
 - **SSH를 통한 원격 bash 명령 실행 시 따옴표 이스케이프 주의:** PowerShell에서 변수(`$BODY`)를 따옴표 안에 넣어 원격 `curl` 등을 호출하면 bash 쪽에서 JSON 포맷 에러(`400 Bad Request` 등)가 발생하기 쉽다. 복잡한 인용부호(JSON 등)가 포함된 스크립트는 **전체를 Base64로 인코딩한 뒤 원격에서 디코딩하여 `bash`로 실행**한다 (`echo $b64 | base64 -d | bash`).
@@ -358,7 +364,10 @@ Claude Code 는 SessionStart 훅이 자동 실행한다(로컬 모드). **훅이
 - **`<저장소>/scripts/verify.sh`** — push 전 검증의 **단일 진입점**. 스택을 자동 판별해
   `./gradlew test` 또는 `npm run typecheck/lint/test` 를 돌리고, `scripts/verify.d/*.sh` 추가 검사를 실행한다.
   문서·도구 설정만 바뀐 push 는 스스로 건너뛴다. 우회는 `MSA_SKIP_VERIFY=1`, 우회했다면 그 사실을 보고/이슈에 남길 것.
-  - 호출자 3곳이 **같은 스크립트**를 부른다: `.githooks/pre-push`(도구 무관) / `.claude/hooks/pre-push-verify.sh`(Claude) / CI.
+  - 호출자 2곳이 **같은 스크립트**를 부른다: `.githooks/pre-push`(도구 무관) / `.claude/hooks/pre-push-verify.sh`(Claude).
+  - **CI 는 `verify.sh` 를 부르지 않는다**(2026-10-01 실측: Spring 4개 저장소 `.github/` 의 `verify.sh` 참조 0건, gateway#288). `pr-check.yml` 이 `pull_request` 에서만 `./gradlew test` 를 직접 돌린다 —
+    같은 테스트지만 `verify.d/*.sh` 추가 검사와 문서 전용 스킵은 없다. 따라서 훅이 없는 경로(훅 미설치 클론, `--no-verify`/`MSA_SKIP_VERIFY=1`, 웹 편집)로 **main 에 직접 push 하면 아무 검증도 걸리지 않고 곧 배포된다.**
+    CI 가 `verify.sh` 를 부르게 하는 것은 별도 결정 사항이다.
   - `.githooks/pre-push` 는 클론마다 `~/msa/scripts/bootstrap-hooks.sh` 를 1회 돌려 `core.hooksPath` 를 걸어야 활성화된다
     (이 설정은 커밋되지 않는 로컬 설정이다). **새 클론·새 머신에서 제일 먼저 할 일.**
   - 2026-08-21 이전에는 검증이 `.claude/hooks/` 아래에만 있어 Claude 이외의 도구가 push 하면 아무 검증도 걸리지 않았다.
