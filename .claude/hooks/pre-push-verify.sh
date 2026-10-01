@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # PreToolUse(Bash) 훅 — `git push` 직전에 scripts/verify.sh 를 돌린다.
 #
-# 검증 로직은 여기 있지 않다. scripts/verify.sh 한 곳에 있고 .githooks/pre-push 와 CI 도
+# 검증 로직은 여기 있지 않다. scripts/verify.sh 한 곳에 있고 .githooks/pre-push 도
 # 같은 스크립트를 부른다 — 예전처럼 Claude 훅에만 로직이 있으면 다른 도구의 push 는
 # 아무 검증도 못 받는다.
 # exit 2 = 도구 호출 차단(사유가 Claude 에게 전달됨), exit 0 = 통과.
