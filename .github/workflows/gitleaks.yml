@@ -1,0 +1,57 @@
+# 시크릿 유입 차단 (posselect-shell#24 항목 2)
+#
+# 왜 별도 파일인가: pr-check.yml 은 빌드/테스트 게이트이고, 이 워크플로는 언어와 무관하게
+# 전 저장소에 같은 내용으로 들어간다. 이 파일은 ~/msa/scripts/templates/gitleaks.yml 이 원본이다.
+# 저장소별로 손으로 고치지 말고 원본을 고친 뒤 다시 롤아웃할 것.
+#
+# 동작:
+#   - pull_request: 이 PR 이 추가한 커밋 범위(base..head)만 스캔한다. 과거 히스토리의 잔재 때문에
+#     새 PR 이 영구 실패하는 일을 막기 위해서다. (2026-10-01 실측: 13개 저장소 origin/main 은 0건)
+#   - schedule(주 1회)/수동: 전체 히스토리를 스캔한다. PR 을 거치지 않은 main 직접 push 를 잡는다.
+# 도구: gitleaks CLI 를 버전·SHA256 고정으로 받는다(서드파티 액션 미사용 — 공급망 노출 축소).
+# 출력: --redact 로 시크릿 값을 로그에 남기지 않는다. 오탐은 저장소 루트 .gitleaksignore 에 fingerprint 로 등재.
+name: Gitleaks
+
+on:
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '17 3 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gitleaks-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    env:
+      GITLEAKS_VERSION: '8.30.1'
+      GITLEAKS_SHA256: '551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb'
+      BASE_SHA: ${{ github.event.pull_request.base.sha }}
+      HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install gitleaks (pinned, checksum verified)
+        run: |
+          curl -sSfL -o gitleaks.tgz \
+            "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz"
+          echo "${GITLEAKS_SHA256}  gitleaks.tgz" | sha256sum -c -
+          tar xzf gitleaks.tgz gitleaks
+
+      - name: Scan
+        run: |
+          if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
+            echo "scan range: ${BASE_SHA}..${HEAD_SHA}"
+            ./gitleaks git . --log-opts="${BASE_SHA}..${HEAD_SHA}" --redact --no-banner
+          else
+            echo "scan: full history"
+            ./gitleaks git . --redact --no-banner
+          fi
