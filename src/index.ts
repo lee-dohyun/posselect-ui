@@ -28,6 +28,8 @@ export { ProductGrid } from './components/ProductGrid';
 export type { ProductGridProps } from './components/ProductGrid';
 export { ProductCard } from './components/ProductCard';
 export type { ProductCardProps } from './components/ProductCard';
+export { CategoryTiles } from './components/CategoryTiles';
+export type { CategoryTileItem, CategoryTilesProps } from './components/CategoryTiles';
 
 
 // CSS is not re-exported from here — consuming apps import it once at the root, e.g.:
