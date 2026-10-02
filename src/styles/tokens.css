@@ -577,6 +577,18 @@ textarea.input { min-height: 90px; resize: vertical; }
   .empty-state { padding: var(--space-8) var(--space-4); }
 }
 
+/* The quick-menu rail needs a side gutter to dock into. `.container` is 1200px wide with
+   var(--space-6) padding, the rail is 70px wide and sits 20px in from the edge, so that
+   gutter only exists from 1340px up: 1200 − 2×20.4 + 2×(70 + 20) ≈ 1340. Between the
+   phone breakpoint (where it becomes the bottom bar) and that width the rail sat on top
+   of the right-hand column — measured on home.posselect.com: 70px of overlap at
+   1024–1200px, 30px at 1280px (store.front#37). Same call as .wing-banner on phones:
+   overlapping the content is worse than not showing it. The scroll-to-top button stays.
+   Retune 1339 if .container's width/padding or the rail's width/offset changes. */
+@media (min-width: 769px) and (max-width: 1339px) {
+  .quick-menu { display: none; }
+}
+
 @media (max-width: 480px) {
   /* Below ~480px auto-fill drops to a single column; pin it to two so the storefront
      still reads as a grid. */
