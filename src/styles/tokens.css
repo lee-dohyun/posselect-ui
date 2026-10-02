@@ -492,6 +492,19 @@ textarea.input { min-height: 90px; resize: vertical; }
 }
 /* Scroll container emitted by <Table>. Keeps a wide table's overflow inside the table
    itself instead of letting it push the whole page into horizontal scroll. */
+
+/* — category tiles — */
+/* Hairline-framed icon links, one per top-level category. auto-fit lets 6~8 tiles share
+   one row on desktop without the caller picking a column count. */
+.category-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(96px, 1fr)); gap: var(--space-3); }
+.category-tile {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: var(--space-2); padding: var(--space-4) var(--space-2);
+  border: 1px solid var(--color-divider); background: transparent;
+  color: var(--color-neutral-700); text-decoration: none;
+}
+.category-tile:hover, .category-tile:focus-visible { border-color: var(--color-accent); color: var(--color-accent-900); background: var(--color-accent-100); }
+.category-tile-label { font-size: 13px; font-weight: 500; text-align: center; word-break: keep-all; }
 .table-wrap { width: 100%; overflow-x: auto; }
 
 /* ───────────────────────────────────────────────────────────────────────────────
@@ -540,6 +553,11 @@ textarea.input { min-height: 90px; resize: vertical; }
   /* A 132px promo wing docked to the left edge has nowhere to go on a phone, and
      overlapping the content to show a banner is worse than not showing it. */
   .wing-banner { display: none; }
+
+  /* auto-fit would squeeze 8 tiles into three uneven rows on a phone; pin 4-up (2 rows of 4). */
+  .category-tiles { grid-template-columns: repeat(4, 1fr); gap: var(--space-2); }
+  .category-tile { padding: var(--space-3) var(--space-1); }
+  .category-tile-label { font-size: 12px; }
 
   .gallery-main { height: 220px; }
   /* Fixed 5-up thumbnails shrink to ~55px each on a phone. Scroll them instead. */
