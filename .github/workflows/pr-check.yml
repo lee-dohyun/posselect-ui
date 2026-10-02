@@ -21,6 +21,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      # AGENTS.md 캐논 블록 손편집 탐지 + 정본 대비 낡음 경고 (gateway#215)
+      - name: Canon block integrity
+        run: CANON_CHECK_REMOTE=1 bash scripts/verify.d/check-canon-block.sh
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
