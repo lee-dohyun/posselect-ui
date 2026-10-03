@@ -122,7 +122,7 @@ docker build -t posselect-ui . && docker run -p 8080:80 posselect-ui
 
 ---
 
-<!-- canon:begin sha=8b53a9f595d2 src=~/msa/AGENTS.md -->
+<!-- canon:begin sha=f406168037b6 src=~/msa/AGENTS.md -->
 ## 공통 캐논 (모든 AI 도구 공통)
 
 > **공통 캐논 (자동 주입 — 손으로 고치지 말 것).** 원본은 `~/msa/AGENTS.md`이고 이 블록은
@@ -307,6 +307,8 @@ Claude Code 는 SessionStart 훅이 자동 실행한다(로컬 모드). **훅이
 - 직접 push 가 거부되면(non-fast-forward) `wip/auto/<branch>-<issue>` 로 우회 push 하고 코멘트에 그 이름을 적는다 — 남의 브랜치를 덮지 않는다.
 - 커밋 메시지에 **`[skip ci]` 를 넣지 않는다.** 본문에서도 인식되므로 그 브랜치가 나중에 머지될 때 배포가 조용히 건너뛰어진다.
 - 커밋 전 `git diff HEAD` 패치 사본을 `~/.cache/msa-agent/wip/` 에 남긴다(worktree 가 나중에 지워져도 복구 가능하게).
+- **레코드에 worktree 가 없으면**(`claim.sh` 를 `~/msa` 등 git 밖에서 실행) `~/git/*` 의 모든 worktree 에서 이슈 번호로 찾는다(gateway#309). `<이슈저장소명>-N`(`gateway-306`, `auth-api-49`)이나 같은 저장소의 `issue-N` 은 **strong** → 위 규칙대로 스냅샷. 다른 저장소의 `issue-N`, 같은 저장소에서 `-N` 으로 끝나는 이름은 **weak** → 커밋하지 않고 미커밋 수·패치 사본만 HANDOFF 에 나열. 공용 클론 본체와 다른 클레임 레코드가 기록한 worktree 는 커밋하지 않는다. 확인: `sweep-claims.sh --discover <owner/repo> <issue>`.
+  그래도 1차 수단은 **작업할 worktree 안에서 `claim.sh` 를 실행하는 것**이다 — 이름 탐색은 이름을 규칙대로 지었을 때만 잡힌다.
 
 **사후 회수는 보험이지 대체재가 아니다.** 위 제약 때문에 스냅샷이 포기되는 경우가 있으므로, 살아 있는 동안 스스로 push 하는 규칙(§ 인계 가능 = 원격에 push된 상태)이 여전히 1차 수단이다.
 
