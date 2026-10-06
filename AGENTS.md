@@ -40,12 +40,14 @@ npm run build-storybook   # 정적 빌드 → storybook-static/ (배포 산출�
   대상이다.
 - `npm run test:coverage`(`vitest run --coverage`, `@vitest/coverage-v8`)는 `pr-check.yml`에서
   리포트만 하고 빌드를 막지 않는다(아티팩트로 업로드). 임계값 게이트는 아직 없다.
-- 스토리 12개(`Button`/`Dialog`/`Pagination`/`Field`/`Gallery`/`Skeleton` 등)에 `play:` 인터랙션이
-  붙어 있고 `npm run test-storybook`(`@storybook/test-runner` + playwright)이 이를 실행한다. 이건
-  여전히 CI에 없다 — Storybook 서버가 떠 있어야 한다.
-- CI(`.github/workflows/ci.yml`, main push 배포용)가 실제로 돌리는 검증은 여전히 `npm run typecheck`
-  하나뿐이다 — 테스트 게이트는 `pr-check.yml`(PR 단계)에만 있다. 컴포넌트 로직을 건드렸으면
-  `npm test`/`npm run test-storybook`을 직접 실행해 확인할 것.
+- **스토리 테스트**: `npm run test:stories`(vitest `storybook` 프로젝트, `@storybook/addon-vitest` + 실제 chromium)가
+  모든 스토리를 렌더링하고 `play:` 인터랙션(`Dialog`/`Gallery`/`Pagination` 3개)을 실행한다 — 2026-10-06 기준
+  26개 파일 78건. 처음 한 번 `npx playwright install chromium` 이 필요하다. 인터랙션 도우미는
+  `storybook/test` 에서 import 한다(`@storybook/test` 8.x 패키지는 Storybook 10 과 맞지 않아 제거했다).
+- CI(`.github/workflows/ci.yml`)는 PR 과 main push 에서 `typecheck` 와 `stories` 를 돌리고, 둘 다 통과해야
+  문서 사이트를 배포한다. `npm test`(단위)와 커버리지는 `pr-check.yml`(PR 단계)에만 있다 — main 에 직접
+  push 하면 단위 테스트는 로컬 훅(`scripts/verify.sh`)만이 막는다. `verify.sh` 는 스토리 테스트를 돌리지
+  않는다(브라우저가 필요해서). 컴포넌트 동작을 건드렸으면 push 전에 `npm run test:stories` 를 직접 돌릴 것.
 - `@vitejs/plugin-react`는 이 저장소의 `vite ^7` 고정과 맞춰 `5.x`로 둘 것 — `6.x`부터는 `vite ^8`을
   요구해 `ERR_PACKAGE_PATH_NOT_EXPORTED`로 vitest 구동 자체가 깨진다. `@vitest/coverage-v8`도
   `vitest`(현재 `4.1.10`)와 마이너까지 맞출 것 — 어긋나면 "Running mixed versions" 경고가 뜬다.
