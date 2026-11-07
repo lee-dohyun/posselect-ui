@@ -124,7 +124,7 @@ docker build -t posselect-ui . && docker run -p 8080:80 posselect-ui
 
 ---
 
-<!-- canon:begin sha=f406168037b6 src=~/msa/AGENTS.md -->
+<!-- canon:begin sha=04c41639a2c4 src=~/msa/AGENTS.md -->
 ## 공통 캐논 (모든 AI 도구 공통)
 
 > **공통 캐논 (자동 주입 — 손으로 고치지 말 것).** 원본은 `~/msa/AGENTS.md`이고 이 블록은
@@ -180,6 +180,7 @@ docker build -t posselect-ui . && docker run -p 8080:80 posselect-ui
 - **`~/msa` 매니페스트는 apply 전에 항상 `kubectl diff -f` 를 먼저 확인한다.** 이미지 태그(`:latest` ↔ 커밋 SHA)나 시크릿 값 등 라이브 상태와 어긋난(drift) 부분을 조용히 덮어써서 롤백되는 사고를 막기 위함이다.
 - 여러 서비스에 걸친 변경은 **배포 순서**를 먼저 설계할 것(예: gateway → front → api 순서를 지켜야 게스트 결제가 안 끊기는 사례, posselect #210).
 - `@posselect/ui` 변경은 Storybook만 자동 배포됨 — 소비 저장소 5개(customer/store/product/admin.front + posselect-shell)를 각각 재빌드해야 화면에 반영 (posselect #197).
+- **PR 자동 머지(Claude 데스크톱 앱의 "Merge when ready", GitHub auto-merge)는 프로덕션 배포 예약이다.** main 에 보호 규칙이 없어(2026-11-07 gateway·product.api·order.api·store.front 확인) 머지가 곧 main push 다. 머지 순간에 사람이 확인하지 않으므로 되돌리기 어려운 변경에는 쓰지 않는다 — 특히 **Flyway 마이그레이션 PR 은 금지**(§DB/스키마의 "push 직전 버전 재확인"을 건너뛴다). 저장소의 GitHub 자동 머지 설정(`allow_auto_merge`)은 같은 날 기준 꺼져 있다(gateway#366).
 - **`[skip ci]`는 커밋 제목뿐 아니라 본문에서도 인식된다.** 다른 커밋을 인용하려고 본문에 그 문자열을 적으면 배포가 조용히 건너뛰어진다 — 실제로 product.api 캐시 수정이 이 때문에 배포되지 않았다(gateway#204).
 - **`[skip ci]`로 건너뛴 배포를 되살릴 때**: `docker-image.yml`에 `workflow_dispatch`만 추가하면 부족하다. `deploy` 잡의 `if:`가 `github.event_name == 'push'`로 고정돼 있어 수동 실행은 빌드만 하고 배포는 skip된다. 조건도 `push || workflow_dispatch`로 함께 풀 것(현재 product.api만 적용됨).
 - **`pull_request` 워크플로는 PR head 브랜치의 파일로 돈다.** main의 워크플로를 고쳐도 이미 열려 있는 PR에는 반영되지 않고, `gh run rerun`은 원래 런의 워크플로 버전을 재사용한다. 수정 확인은 **브랜치를 리베이스한 뒤** 새 런으로 할 것.
@@ -225,6 +226,7 @@ docker build -t posselect-ui . && docker run -p 8080:80 posselect-ui
 - Claude Code는 `EnterWorktree` 도구로 `.claude/worktrees/<repo>/<name>` 아래 자동 생성/전환한다 — 기본 경로를 그대로 쓴다.
 - Codex/Antigravity 등 자체 worktree 기능이 없는 도구는 `git worktree add ../<repo>-<slug> -b <branch>`로 수동 생성하고, 작업 종료 후 `git worktree remove`로 정리한다.
 - **각 저장소 `.gitignore`에 `.claude/worktrees/`가 반드시 있어야 한다.** 없으면 `git add -A`/`git add .` 한 번에 worktree 디렉터리 전체가 gitlink(모드 160000)로 커밋되어 origin까지 올라갈 수 있다 — 2026-08-21 `customer.front`에서 실제로 발생·이미 push된 상태로 확인됨(별도 정리 필요, 이 문서 편집만으로는 해결되지 않음).
+- **Claude 데스크톱 앱의 브랜치 전환 메뉴(세션 레일 Environment 카드)는 공용 클론에서 쓰지 않는다.** 앱은 전환 전후로 작업 트리를 commit·stash 하고, 이 git 작업에는 저장소 훅도 돌지 않는다(앱 2.42304.0, 2026-10-15 변경). `~/git/<repo>` 에서 쓰면 다른 세션의 미커밋 작업까지 커밋·stash 된다 — §4-1 "공용 클론에서 `git add -A` 금지"와 같은 위험이다. 다른 브랜치가 필요하면 worktree 를 만든다(gateway#366).
 
 ### 이슈를 어느 저장소에 만드나 (2026-08-22 신설)
 
@@ -311,6 +313,7 @@ Claude Code 는 SessionStart 훅이 자동 실행한다(로컬 모드). **훅이
 - 커밋 전 `git diff HEAD` 패치 사본을 `~/.cache/msa-agent/wip/` 에 남긴다(worktree 가 나중에 지워져도 복구 가능하게).
 - **레코드에 worktree 가 없으면**(`claim.sh` 를 `~/msa` 등 git 밖에서 실행) `~/git/*` 의 모든 worktree 에서 이슈 번호로 찾는다(gateway#309). `<이슈저장소명>-N`(`gateway-306`, `auth-api-49`)이나 같은 저장소의 `issue-N` 은 **strong** → 위 규칙대로 스냅샷. 다른 저장소의 `issue-N`, 같은 저장소에서 `-N` 으로 끝나는 이름은 **weak** → 커밋하지 않고 미커밋 수·패치 사본만 HANDOFF 에 나열. 공용 클론 본체와 다른 클레임 레코드가 기록한 worktree 는 커밋하지 않는다. 확인: `sweep-claims.sh --discover <owner/repo> <issue>`.
   그래도 1차 수단은 **작업할 worktree 안에서 `claim.sh` 를 실행하는 것**이다 — 이름 탐색은 이름을 규칙대로 지었을 때만 잡힌다.
+  - **Claude 데스크톱 앱이 만든 worktree(Environments 의 worktree 설정, 세션이 띄운 중첩 세션)도 같다.** 앱의 브랜치 이름은 `claude/<자동이름>` 이라 위 이름 탐색에 잡히지 않는다. 세션을 띄우는 쪽이 브랜치 이름을 정할 수 있으면 `<이슈저장소명>-N` 으로 짓는다(gateway#366).
 
 **사후 회수는 보험이지 대체재가 아니다.** 위 제약 때문에 스냅샷이 포기되는 경우가 있으므로, 살아 있는 동안 스스로 push 하는 규칙(§ 인계 가능 = 원격에 push된 상태)이 여전히 1차 수단이다.
 
